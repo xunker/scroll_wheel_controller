@@ -16,6 +16,7 @@
 #define ENC_PIN_B 3 // need to be interrupt pin
 
 #define ENCODER_STEPS 2 // number of increments per encoder detent
+#define MOUSE_SCROLL_AMOUNT 5
 
 Button middleButton(MIDDLE_PIN);
 Button upButton(UP_PIN);
@@ -40,10 +41,19 @@ modeMask - binary bitmask
   0: default key down time
   1: long key down time
 
+0b10000000 - action will also send mouse events
+0b11000000 - mouse scroll up
+0b10100000 - mouse scroll down
+
+
 combine modeMasks using |
 */
-#define REGULAR_KEY_DOWN_TIME 0b00000001
+
 #define LONG_KEY_DOWN_TIME 0b00000001
+
+#define MOUSE_EVENT 0b10000000
+#define MOUSE_SCROLL_POSITIVE MOUSE_EVENT | 0b01000000
+#define MOUSE_SCROLL_NEGATIVE MOUSE_EVENT | 0b00100000
 
 #define KEY_DOWN_TIME_REGULAR 50 // milliseconds
 #define KEY_DOWN_TIME_LONG 1100  // milliseconds
@@ -57,7 +67,7 @@ struct controlMode {
   controlAction middle;
 };
 
-#define NUMBER_OF_MODES 4
+#define NUMBER_OF_MODES 5
 controlMode controlModeList[NUMBER_OF_MODES] = {
     {{"Volume"},
      {"", NULL, NULL, NULL, NULL},
@@ -80,6 +90,13 @@ controlMode controlModeList[NUMBER_OF_MODES] = {
      {"Scrub >", KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_RIGHT_ARROW, NULL},
      {"Play/Pause", KEY_SPACE, NULL, NULL, NULL}},
 
+    {{"Mouse"},
+     {"", NULL, NULL, NULL, NULL},
+     {"", NULL, NULL, NULL, NULL},
+     {"Up", NULL, NULL, NULL, NULL, MOUSE_SCROLL_NEGATIVE},
+     {"Down", NULL, NULL, NULL, NULL, MOUSE_SCROLL_POSITIVE},
+     {"Select", NULL, NULL, NULL, NULL}},
+
     {{"Navigation"},
      {"Back", KEY_LEFT_GUI, KEY_LEFT_BRACE, NULL, NULL},     // CONSUMER_BROWSER_BACK maybe
      {"Forward", KEY_LEFT_GUI, KEY_RIGHT_BRACE, NULL, NULL}, // CONSUMER_BROWSER_FORWARD maybe
@@ -87,7 +104,6 @@ controlMode controlModeList[NUMBER_OF_MODES] = {
      {"Down", KEY_DOWN_ARROW, NULL, NULL, NULL},
      {"Select", KEY_ENTER, NULL, NULL, NULL}}};
 
-// controlMode currentMode = vlc;
 uint8_t currentModeIndex = 0;
 
 uint8_t previousModeIndex = currentModeIndex;
@@ -119,6 +135,7 @@ setup()
   // Consumer.begin();
 
   Keyboard.begin();
+  Mouse.begin();
 }
 
 // bool pressed = false;
@@ -126,10 +143,11 @@ setup()
 #define OUTPUT_EVERY 5000
 unsigned long nextOutput = OUTPUT_EVERY;
 
+// Send action but don't release the keys
 void sendAction(controlAction actionToSend)
 {
 
-  Serial.print("Key action is '");
+  Serial.print("Sending key action '");
   Serial.print(actionToSend.name);
   Serial.println("'");
 
@@ -145,14 +163,39 @@ void sendAction(controlAction actionToSend)
     Keyboard.press(actionToSend.consumerKey);
   }
 
-  if (actionToSend.modeMask & 0b00000001) {
+  if (bitRead(actionToSend.modeMask, 7)) {
+    if (bitRead(actionToSend.modeMask, 6)) {
+      Serial.println("scrolling down");
+      Mouse.move(0, 0, MOUSE_SCROLL_AMOUNT);
+    }
+    if (bitRead(actionToSend.modeMask, 5)) {
+      Serial.println("scrolling up");
+      Mouse.move(0, 0, -MOUSE_SCROLL_AMOUNT);
+    }
+  }
+}
+
+void releaseAction(controlAction actionToRelease) {
+  Serial.print("Releasing key action '");
+  Serial.print(actionToRelease.name);
+  Serial.println("'");
+
+  Keyboard.releaseAll();
+}
+
+// send action and release the keys immediately after correct delay
+void sendActionAndRelease(controlAction actionToSend) {
+
+  sendAction(actionToSend);
+
+  if (actionToSend.modeMask & LONG_KEY_DOWN_TIME) {
     Serial.println("Using KEY_DOWN_TIME_LONG");
     delay(KEY_DOWN_TIME_LONG);
   } else {
     delay(KEY_DOWN_TIME_REGULAR);
   }
 
-  Keyboard.releaseAll();
+  releaseAction(actionToSend);
 }
 
 void changeModeMessage() {
@@ -182,8 +225,19 @@ void loop() {
 
   }
 
-  if (middleButton.wasPressed()) {
+  if (leftButton.wasPressed()) {
+    sendAction(currentMode().left);
+  } else if (leftButton.wasReleased()) {
+    releaseAction(currentMode().left);
+  } else if (rightButton.wasPressed()) {
+    sendAction(currentMode().right);
+  } else if (rightButton.wasReleased()) {
+    releaseAction(currentMode().right);
+  } else if (middleButton.wasPressed()) {
     sendAction(currentMode().middle);
+  } else if (middleButton.wasReleased()) {
+    releaseAction(currentMode().middle);
+
   } else if (upButton.wasPressed()) {
     currentModeIndex++;
     if (currentModeIndex >= NUMBER_OF_MODES) {
@@ -192,11 +246,10 @@ void loop() {
     previousModeIndex = currentModeIndex;
 
     changeModeMessage();
-  }
-  else if (downButton.wasPressed()) {
+  } else if (downButton.wasPressed()) {
     if (currentModeIndex == toggleModeIndex) {
       if (previousModeIndex != toggleModeIndex) {
-        Serial.print("Returning to previous mode");
+        Serial.println("Returning to previous mode");
         currentModeIndex = previousModeIndex;
         changeModeMessage();
       } else {
@@ -210,17 +263,12 @@ void loop() {
       currentModeIndex = toggleModeIndex;
     }
   }
-  else if (leftButton.wasPressed()) {
-    sendAction(currentMode().left);
-  }
-  else if (rightButton.wasPressed()) {
-    sendAction(currentMode().right);
-  }
+
 
   if (encoderPos > 0) {
-    sendAction(currentMode().wheelCCW);
+    sendActionAndRelease(currentMode().wheelCCW);
   } else if (encoderPos < 0) {
-    sendAction(currentMode().wheelCW);
+    sendActionAndRelease(currentMode().wheelCW);
   }
   if (encoderPos != 0) {
     encoder.write(0);
