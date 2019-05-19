@@ -5,17 +5,53 @@
 
 #include <JC_Button.h> // https://github.com/JChristensen/JC_Button
 
-#include <Encoder.h> // https://www.pjrc.com/teensy/td_libs_Encoder.html
+// Be sure to enable half-step mode
+#include <Rotary.h>  // https://github.com/brianlow/Rotary
 
-#define MIDDLE_PIN 7
-#define UP_PIN 8
-#define DOWN_PIN 4
-#define LEFT_PIN 5
-#define RIGHT_PIN 6
-#define ENC_PIN_A 2 // need to be interrupt pin
-#define ENC_PIN_B 3 // need to be interrupt pin
+#define USE_SERIAL
+#ifdef USE_SERIAL
+  #define debug(msg) Serial.print(msg)
+  #define debugln(msg) Serial.println(msg)
+  #define debuglnfmt(msg, fmt) Serial.println(msg, fmt)
+#else
+  #define debug(msg)
+  #define debugln(msg)
+  #define debuglnfmt(msg, fmt)
+#endif
 
-#define ENCODER_STEPS 2 // number of increments per encoder detent
+// #define ARDUINO_MICRO
+#define SPARKFUN_PRO_MICRO // https://learn.sparkfun.com/tutorials/pro-micro--fio-v3-hookup-guide
+
+#define LED_BUILTIN_ON HIGH
+#define LED_BUILTIN_OFF LOW
+
+#ifdef ARDUINO_MICRO
+  // SDA is 2, SCL is 3
+  #define MIDDLE_PIN 7
+  #define UP_PIN 10
+  #define DOWN_PIN 4
+  #define LEFT_PIN 5
+  #define RIGHT_PIN 6
+  #define ENC_PIN_A 8
+  #define ENC_PIN_B 9
+#endif
+
+#ifdef SPARKFUN_PRO_MICRO
+  // SDA is 2, SCL is 3
+  #define MIDDLE_PIN 7
+  #define UP_PIN 10
+  #define DOWN_PIN 4
+  #define LEFT_PIN 5
+  #define RIGHT_PIN 6
+  #define ENC_PIN_A 8
+  #define ENC_PIN_B 9
+
+  #define LED_BUILTIN 17 // rx led on pro micro, has no led on 13
+  #define LED_BUILTIN_ON LOW
+  #define LED_BUILTIN_OFF HIGH
+
+#endif
+
 #define MOUSE_SCROLL_AMOUNT 5
 
 Button middleButton(MIDDLE_PIN);
@@ -24,9 +60,8 @@ Button downButton(DOWN_PIN);
 Button leftButton(LEFT_PIN);
 Button rightButton(RIGHT_PIN);
 
-Encoder encoder(ENC_PIN_A, ENC_PIN_B);
+Rotary encoder = Rotary(ENC_PIN_A, ENC_PIN_B);
 
-// maybe? https://forum.arduino.cc/index.php?topic=157618.0
 #define MAX_KEYS_PER_ACTION 3
 struct controlAction {
   const String name; // name of action
@@ -95,7 +130,7 @@ controlMode controlModeList[NUMBER_OF_MODES] = {
      {"", NULL, NULL, NULL, NULL},
      {"Up", NULL, NULL, NULL, NULL, MOUSE_SCROLL_NEGATIVE},
      {"Down", NULL, NULL, NULL, NULL, MOUSE_SCROLL_POSITIVE},
-     {"Select", NULL, NULL, NULL, NULL}},
+     {"", NULL, NULL, NULL, NULL}},
 
     {{"Navigation"},
      {"Back", KEY_LEFT_GUI, KEY_LEFT_BRACE, NULL, NULL},     // CONSUMER_BROWSER_BACK maybe
@@ -119,11 +154,14 @@ controlMode toggleMode() {
   return controlModeList[toggleModeIndex];
 }
 
-void
-setup()
-{
-  Serial.begin(9600);
+void setup() {
+  #ifdef USE_SERIAL
+    Serial.begin(9600);
+  #endif
   delay(5000);
+
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LED_BUILTIN_OFF);
 
   pinMode(MIDDLE_PIN, INPUT_PULLUP);
   pinMode(UP_PIN, INPUT_PULLUP);
@@ -132,13 +170,34 @@ setup()
   pinMode(RIGHT_PIN, INPUT_PULLUP);
   pinMode(ENC_PIN_A, INPUT_PULLUP);
   pinMode(ENC_PIN_B, INPUT_PULLUP);
+
   // Consumer.begin();
 
   Keyboard.begin();
   Mouse.begin();
+
+  // https: //github.com/brianlow/Rotary/blob/master/examples/InterruptProMicro/InterruptProMicro.ino
+  encoder.begin();
+  PCICR |= (1 << PCIE0);
+  PCMSK0 |= (1 << PCINT4) | (1 << PCINT5);
+  sei();
 }
 
-// bool pressed = false;
+// https: //github.com/brianlow/Rotary/blob/master/examples/InterruptProMicro/InterruptProMicro.ino
+bool encoderTurnedCW = false;
+bool encoderTurnedCCW = false;
+ISR(PCINT0_vect) {
+  unsigned char result = encoder.process();
+  if (result == DIR_NONE) {
+    // do nothing
+  }
+  else if (result == DIR_CW) {
+    encoderTurnedCW = true;
+  }
+  else if (result == DIR_CCW) {
+    encoderTurnedCCW = true;
+  }
+}
 
 #define OUTPUT_EVERY 5000
 unsigned long nextOutput = OUTPUT_EVERY;
@@ -146,39 +205,42 @@ unsigned long nextOutput = OUTPUT_EVERY;
 // Send action but don't release the keys
 void sendAction(controlAction actionToSend)
 {
+  digitalWrite(LED_BUILTIN, LED_BUILTIN_ON);
 
-  Serial.print("Sending key action '");
-  Serial.print(actionToSend.name);
-  Serial.println("'");
+  debug("Sending key action '");
+  debug(actionToSend.name);
+  debugln("'");
 
   for (uint8_t i = 0; i < MAX_KEYS_PER_ACTION; i++) {
     if (actionToSend.keys[i]) {
-      Serial.println(actionToSend.keys[i], HEX);
+      debuglnfmt(actionToSend.keys[i], HEX);
       Keyboard.press(actionToSend.keys[i]);
     }
   }
 
   if (actionToSend.consumerKey) {
-    Serial.println(actionToSend.consumerKey, HEX);
+    debuglnfmt(actionToSend.consumerKey, HEX);
     Keyboard.press(actionToSend.consumerKey);
   }
 
   if (bitRead(actionToSend.modeMask, 7)) {
     if (bitRead(actionToSend.modeMask, 6)) {
-      Serial.println("scrolling down");
+      debugln("scrolling down");
       Mouse.move(0, 0, MOUSE_SCROLL_AMOUNT);
     }
     if (bitRead(actionToSend.modeMask, 5)) {
-      Serial.println("scrolling up");
+      debugln("scrolling up");
       Mouse.move(0, 0, -MOUSE_SCROLL_AMOUNT);
     }
   }
 }
 
 void releaseAction(controlAction actionToRelease) {
-  Serial.print("Releasing key action '");
-  Serial.print(actionToRelease.name);
-  Serial.println("'");
+  digitalWrite(LED_BUILTIN, LED_BUILTIN_OFF);
+
+  debug("Releasing key action '");
+  debug(actionToRelease.name);
+  debugln("'");
 
   Keyboard.releaseAll();
 }
@@ -189,21 +251,22 @@ void sendActionAndRelease(controlAction actionToSend) {
   sendAction(actionToSend);
 
   if (actionToSend.modeMask & LONG_KEY_DOWN_TIME) {
-    Serial.println("Using KEY_DOWN_TIME_LONG");
+    debugln("Using KEY_DOWN_TIME_LONG");
     delay(KEY_DOWN_TIME_LONG);
   } else {
     delay(KEY_DOWN_TIME_REGULAR);
+
   }
 
   releaseAction(actionToSend);
 }
 
 void changeModeMessage() {
-  Serial.print("Changing control mode to ");
-  Serial.print(currentModeIndex);
-  Serial.print(" '");
-  Serial.print(currentMode().name);
-  Serial.println("'");
+  debug("Changing control mode to ");
+  debug(currentModeIndex);
+  debug(" '");
+  debug(currentMode().name);
+  debugln("'");
 }
 
 void loop() {
@@ -213,15 +276,13 @@ void loop() {
   leftButton.read();
   rightButton.read();
 
-  long encoderPos = encoder.read();
-
   if (nextOutput < millis()) {
     nextOutput = millis() + OUTPUT_EVERY;
 
-    Serial.print(millis());
-    Serial.print(" Current Control Mode is '");
-    Serial.print(currentMode().name);
-    Serial.println("'");
+    debug(millis());
+    debug(" Current Control Mode is '");
+    debug(currentMode().name);
+    debugln("'");
 
   }
 
@@ -249,28 +310,29 @@ void loop() {
   } else if (downButton.wasPressed()) {
     if (currentModeIndex == toggleModeIndex) {
       if (previousModeIndex != toggleModeIndex) {
-        Serial.println("Returning to previous mode");
+        debugln("Returning to previous mode");
         currentModeIndex = previousModeIndex;
         changeModeMessage();
       } else {
-        Serial.println("Toggle mode and previous mode are the same");
+        debugln("Toggle mode and previous mode are the same");
       }
     } else {
-      Serial.print("Temporary toggle to '");
-      Serial.print(toggleMode().name);
-      Serial.println("'");
+      debug("Temporary toggle to '");
+      debug(toggleMode().name);
+      debugln("'");
 
       currentModeIndex = toggleModeIndex;
     }
   }
 
-
-  if (encoderPos > 0) {
+  if (encoderTurnedCCW) {
     sendActionAndRelease(currentMode().wheelCCW);
-  } else if (encoderPos < 0) {
+  } else if (encoderTurnedCW) {
     sendActionAndRelease(currentMode().wheelCW);
   }
-  if (encoderPos != 0) {
-    encoder.write(0);
+
+  if (encoderTurnedCW || encoderTurnedCCW) {
+    encoderTurnedCCW = false;
+    encoderTurnedCW = false;
   }
 }
