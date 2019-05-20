@@ -92,7 +92,9 @@ modeMask - binary bitmask
 0b10000000 - action will also send mouse events
 0b11000000 - mouse scroll up
 0b10100000 - mouse scroll down
-
+0b10010000 - mouse left click
+0b10001000 - mouse right click
+0b10000100 - mouse middle click
 
 combine modeMasks using |
 */
@@ -102,6 +104,9 @@ combine modeMasks using |
 #define MOUSE_EVENT 0b10000000
 #define MOUSE_SCROLL_POSITIVE MOUSE_EVENT | 0b01000000
 #define MOUSE_SCROLL_NEGATIVE MOUSE_EVENT | 0b00100000
+#define MOUSE_LEFT_CLICK MOUSE_EVENT | 0b00010000
+#define MOUSE_RIGHT_CLICK MOUSE_EVENT | 0b00001000
+#define MOUSE_MIDDLE_CLICK MOUSE_EVENT | 0b00000100
 
 #define KEY_DOWN_TIME_REGULAR 50 // milliseconds
 #define KEY_DOWN_TIME_LONG 1100  // milliseconds
@@ -139,14 +144,14 @@ controlMode controlModeList[NUMBER_OF_MODES] = {
      {"Play/\nPause", KEY_SPACE, NULL, NULL, NULL}},
 
     {{"Mouse"},
-     {"--", NULL, NULL, NULL, NULL},
-     {"--", NULL, NULL, NULL, NULL},
+     {"Left\nClick", NULL, NULL, NULL, NULL, MOUSE_LEFT_CLICK},
+     {"Right\nClick", NULL, NULL, NULL, NULL, MOUSE_RIGHT_CLICK},
      {"^ Scroll", NULL, NULL, NULL, NULL, MOUSE_SCROLL_NEGATIVE},
      {"Scroll v", NULL, NULL, NULL, NULL, MOUSE_SCROLL_POSITIVE},
-     {"--", NULL, NULL, NULL, NULL}},
+     {"Middle\nClick", NULL, NULL, NULL, NULL, MOUSE_MIDDLE_CLICK}},
 
     {{"Navigation"},
-     {"Next\nPage", KEY_LEFT_GUI, KEY_LEFT_BRACE, NULL, NULL},     // CONSUMER_BROWSER_BACK maybe
+     {"Next\nPage", KEY_LEFT_GUI, KEY_LEFT_BRACE, NULL, NULL},  // CONSUMER_BROWSER_BACK maybe
      {"Prev\nPage", KEY_LEFT_GUI, KEY_RIGHT_BRACE, NULL, NULL}, // CONSUMER_BROWSER_FORWARD maybe
      {"^ Arrow", KEY_UP_ARROW, NULL, NULL, NULL},
      {"Arrow v", KEY_DOWN_ARROW, NULL, NULL, NULL},
@@ -254,6 +259,8 @@ void updateDisplay() {
   if (previousModeIndex == currentModeIndex) {
     if (currentModeIndex != toggleModeIndex) {
       oledPrintCentered(toggleMode().name + " ->", displayHeightInRows - 1);
+    } else {
+      oledPrintCentered("--", displayHeightInRows - 1);
     }
   } else {
     if (previousModeIndex != toggleModeIndex) {
@@ -280,27 +287,32 @@ void setup() {
   #endif // RST_PIN >= 0
 
   // oled.setFont(Iain5x7); // proportional
-  // oled.setFont(Adafruit5x7);
+  // oled.setFont(Callibri15); // proportional
+  // oled.setFont(Arial14);// proportional
+  // oled.setFont(Callibri11_bold);// proportional
+  // oled.setFont(TimesNewRoman13);// proportional
+  oled.setFont(Adafruit5x7);
   // oled.setFont(fixed_bold10x15);
   // oled.setFont(font5x7);
   // oled.setFont(font8x8);
   // oled.setFont(lcd5x7);
   // oled.setFont(newbasic3x5);
-  oled.setFont(Stang5x7);
+  // oled.setFont(Stang5x7);
   // oled.setFont(System5x7);
   // oled.setFont(Wendy3x5);
   // oled.setFont(X11fixed7x14);
   // oled.setFont(X11fixed7x14B);
   // oled.setFont(ZevvPeep8x16);
 
-  displayHeightInRows = (oled.displayHeight() / oled.fontHeight()) - 1;
-  displayWidthInColumns = (oled.displayWidth() / oled.fontWidth()) - 1;
+    displayHeightInRows = (oled.displayHeight() / oled.fontHeight()) - 1;
+    displayWidthInColumns = (oled.displayWidth() / oled.fontWidth()) - 1;
 
-  oled.clear();
-  oled.print("Booting");
-  for (uint8_t i = 0; i < 10; i++) {
-    delay(200);
-    oled.print(".");
+    oled.clear();
+    oled.print("Booting");
+    for (uint8_t i = 0; i < 10; i++)
+    {
+      delay(200);
+      oled.print(".");
   }
 
   updateDisplay();
@@ -376,6 +388,18 @@ void sendAction(controlAction actionToSend)
     if (bitRead(actionToSend.modeMask, 5)) {
       debugln("scrolling up");
       Mouse.move(0, 0, -MOUSE_SCROLL_AMOUNT);
+    }
+    if (bitRead(actionToSend.modeMask, 4)) {
+      debugln("left click");
+      Mouse.click(MOUSE_LEFT);
+    }
+    if (bitRead(actionToSend.modeMask, 3)) {
+      debugln("right click");
+      Mouse.click(MOUSE_RIGHT);
+    }
+    if (bitRead(actionToSend.modeMask, 2)) {
+      debugln("middle click");
+      Mouse.click(MOUSE_MIDDLE);
     }
   }
 }
