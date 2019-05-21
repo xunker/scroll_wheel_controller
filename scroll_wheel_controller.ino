@@ -121,6 +121,20 @@ struct controlMode {
 };
 
 #define NUMBER_OF_MODES 5
+/*
+Todo:
+CONSUMER_BRIGHTNESS_UP
+CONSUMER_BRIGHTNESS_DOWN
+CONSUMER_SCREENSAVER
+CONSUMER_POWER
+CONSUMER_SLEEP
+HID_CONSUMER_RESET
+
+Switch application and application windows
+
+MacOS/PC mode, on the fly setting.
+
+*/
 controlMode controlModeList[NUMBER_OF_MODES] = {
     {{"Volume"},
      {"--", NULL, NULL, NULL, NULL},
