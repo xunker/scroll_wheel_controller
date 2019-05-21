@@ -21,7 +21,7 @@ SSD1306AsciiWire oled;
 uint8_t displayHeightInRows;
 uint8_t displayWidthInColumns;
 
-// #define USE_SERIAL
+#define USE_SERIAL
 #ifdef USE_SERIAL
   #define debug(msg) Serial.print(msg)
   #define debugln(msg) Serial.println(msg)
@@ -122,17 +122,25 @@ struct controlMode {
 
 #define NUMBER_OF_MODES 5
 /*
-Todo:
-CONSUMER_BRIGHTNESS_UP
-CONSUMER_BRIGHTNESS_DOWN
-CONSUMER_SCREENSAVER
-CONSUMER_POWER
-CONSUMER_SLEEP
-HID_CONSUMER_RESET
 
-Switch application and application windows
+Ideas for other control modes:
+  CONSUMER_BRIGHTNESS_UP
+  CONSUMER_BRIGHTNESS_DOWN
+  CONSUMER_SCREENSAVER
+  CONSUMER_POWER
+  CONSUMER_SLEEP
+  HID_CONSUMER_RESET
 
-MacOS/PC mode, on the fly setting.
+  Switch application and application windows
+
+Option to define/switch "control sets", e.g. one set for Macos and one for
+Windows, or for specific apps. Do this by long-pressing the mode select button.
+
+When on toggle mode, automatically return to previous mode if no actions after
+N seconds.
+
+Encoder wheel acceleration. E.g. in VLC mode, use faster scrub keypress the
+longer I continuously rotate the wheel.
 
 */
 controlMode controlModeList[NUMBER_OF_MODES] = {
@@ -177,6 +185,11 @@ uint8_t previousModeIndex = currentModeIndex;
 
 // a mode that can be quickly toggled between, ususally volume control
 uint8_t toggleModeIndex = 0;
+
+// when did the user last perform an action?
+unsigned long lastAction = 0;
+// If in toggle mode and no action performed, return to previous mode in this many milliseconds
+#define TOGGLE_MODE_EXPIRES_IN 10000 // ms
 
 controlMode currentMode() {
   return controlModeList[currentModeIndex];
@@ -285,6 +298,14 @@ void updateDisplay() {
   }
 }
 
+bool inToggleMode() {
+  return ((previousModeIndex != currentModeIndex) && (previousModeIndex != toggleModeIndex));
+}
+
+void updateLastAction() {
+  lastAction = millis();
+}
+
 void setup() {
   // #ifdef USE_SERIAL
     // leave serial enabled so we can reprogram properly
@@ -377,6 +398,7 @@ unsigned long nextOutput = OUTPUT_EVERY;
 void sendAction(controlAction actionToSend)
 {
   digitalWrite(LED_BUILTIN, LED_BUILTIN_ON);
+  updateLastAction();
 
   debug("Sending key action '");
   debug(actionToSend.name);
@@ -459,10 +481,12 @@ void loop() {
   leftButton.read();
   rightButton.read();
 
-  if (nextOutput < millis()) {
-    nextOutput = millis() + OUTPUT_EVERY;
+  unsigned long currentMillis = millis();
 
-    debug(millis());
+  if (nextOutput < currentMillis) {
+    nextOutput = currentMillis + OUTPUT_EVERY;
+
+    debug(currentMillis);
     debug(" Current Control Mode is '");
     debug(currentMode().name);
     debugln("'");
@@ -484,6 +508,8 @@ void loop() {
     releaseAction(currentMode().middle);
 
   } else if (upButton.wasPressed()) {
+    updateLastAction();
+
     currentModeIndex++;
     if (currentModeIndex >= NUMBER_OF_MODES) {
       currentModeIndex = 0;
@@ -493,6 +519,8 @@ void loop() {
     changeModeMessage();
     updateDisplay();
   } else if (downButton.wasPressed()) {
+    updateLastAction();
+
     if (currentModeIndex == toggleModeIndex) {
       if (previousModeIndex != toggleModeIndex) {
         debugln("Returning to previous mode");
@@ -521,5 +549,12 @@ void loop() {
   if (encoderTurnedCW || encoderTurnedCCW) {
     encoderTurnedCCW = false;
     encoderTurnedCW = false;
+  }
+
+  if (inToggleMode() && (lastAction < currentMillis - TOGGLE_MODE_EXPIRES_IN)) {
+    debugln("Toggle Mode expired; Returning to previous mode");
+    currentModeIndex = previousModeIndex;
+    changeModeMessage();
+    updateDisplay();
   }
 }
