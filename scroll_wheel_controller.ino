@@ -1,25 +1,16 @@
+// Config options for specific microcontrollers
+#include "mcu.h"
+
 // https://github.com/NicoHood/HID/blob/master/examples/Consumer/Consumer.ino
 // https://github.com/NicoHood/HID/blob/cc946b9dd7b73b61293a4aa74444de3a5a871bb0/src/KeyboardLayouts/ImprovedKeylayoutsUS.h
 // https://github.com/NicoHood/HID/blob/d4938ddcff7970bc1d32a040a08afeac4915e4a9/src/HID-APIs/ConsumerAPI.h
 #include "HID-Project.h"
 
-#include <JC_Button.h> // https://github.com/JChristensen/JC_Button
+#include "buttons.h"
 
-// Be sure to enable half-step mode
-#include <Rotary.h>  // https://github.com/brianlow/Rotary
+#include "encoder.h"
 
-// Assume 128x64 oled is connected via I2C
-// https://github.com/greiman/SSD1306Ascii
-#include <Wire.h>
-#include "SSD1306Ascii.h"
-#include "SSD1306AsciiWire.h"
-// 0X3C+SA0 - 0x3C or 0x3D
-#define I2C_ADDRESS 0x3C
-// Define proper RST_PIN if required.
-#define RST_PIN -1
-SSD1306AsciiWire oled;
-uint8_t displayHeightInRows;
-uint8_t displayWidthInColumns;
+#include "display.h"
 
 #define USE_SERIAL
 #ifdef USE_SERIAL
@@ -32,48 +23,7 @@ uint8_t displayWidthInColumns;
   #define debuglnfmt(msg, fmt)
 #endif
 
-// #define ARDUINO_MICRO
-#define SPARKFUN_PRO_MICRO // https://learn.sparkfun.com/tutorials/pro-micro--fio-v3-hookup-guide
-
-#define LED_BUILTIN_ON HIGH
-#define LED_BUILTIN_OFF LOW
-
-#ifdef ARDUINO_MICRO
-  // SDA is 2, SCL is 3
-  #define MIDDLE_PIN 7
-  #define UP_PIN 10
-  #define DOWN_PIN 4
-  #define LEFT_PIN 5
-  #define RIGHT_PIN 6
-  #define ENC_PIN_A 8
-  #define ENC_PIN_B 9
-#endif
-
-#ifdef SPARKFUN_PRO_MICRO
-  // SDA is 2, SCL is 3
-  #define MIDDLE_PIN 7
-  #define UP_PIN 10
-  #define DOWN_PIN 4
-  #define LEFT_PIN 5
-  #define RIGHT_PIN 6
-  #define ENC_PIN_A 8
-  #define ENC_PIN_B 9
-
-  #define LED_BUILTIN 17 // rx led on pro micro, has no led on 13
-  #define LED_BUILTIN_ON LOW
-  #define LED_BUILTIN_OFF HIGH
-
-#endif
-
 #define MOUSE_SCROLL_AMOUNT 5
-
-Button middleButton(MIDDLE_PIN);
-Button upButton(UP_PIN);
-Button downButton(DOWN_PIN);
-Button leftButton(LEFT_PIN);
-Button rightButton(RIGHT_PIN);
-
-Rotary encoder = Rotary(ENC_PIN_A, ENC_PIN_B);
 
 #define MAX_KEYS_PER_ACTION 3
 struct controlAction {
@@ -142,6 +92,8 @@ N seconds.
 Encoder wheel acceleration. E.g. in VLC mode, use faster scrub keypress the
 longer I continuously rotate the wheel.
 
+Screen saver/screen blanking on inactivity
+
 */
 controlMode controlModeList[NUMBER_OF_MODES] = {
     {{"Volume"},
@@ -203,64 +155,6 @@ controlMode previousMode() {
   return controlModeList[previousModeIndex];
 }
 
-// Print to oled left-justified with newline support
-void oledPrintLeftJustify(String msg, uint8_t row)
-{
-  String substr = "";
-  for (uint8_t i = 0; i < msg.length(); i++) {
-    if (msg[i] == '\n') {
-      oled.setCursor(0, row);
-      oled.print(substr);
-      substr = "";
-      row++;
-    } else {
-      substr = substr + msg[i];
-    }
-  }
-  if (substr.length() > 0) {
-    oled.setCursor(0, row);
-    oled.print(substr);
-  }
-}
-
-// Print to oled right-justified with newline support
-void oledPrintRightJustify(String msg, uint8_t row) {
-  String substr = "";
-  for (uint8_t i = 0; i < msg.length(); i++) {
-    if (msg[i] == '\n') {
-      oled.setCursor(((oled.displayWidth() - oled.fieldWidth(substr.length()))), row);
-      oled.print(substr);
-      substr = "";
-      row++;
-    } else {
-      substr = substr + msg[i];
-    }
-  }
-  if (substr.length() > 0) {
-    oled.setCursor(((oled.displayWidth() - oled.fieldWidth(substr.length()))), row);
-    oled.print(substr);
-  }
-}
-
-// Print to oled centered with newline support
-void oledPrintCentered(String msg, uint8_t row) {
-  String substr = "";
-  for (uint8_t i = 0; i < msg.length(); i++) {
-    if (msg[i] == '\n') {
-      oled.setCursor(((oled.displayWidth() - oled.fieldWidth(substr.length()))/2), row);
-      oled.print(substr);
-      substr = "";
-      row++;
-    } else {
-      substr = substr + msg[i];
-    }
-  }
-  if (substr.length() > 0) {
-    oled.setCursor(((oled.displayWidth() - oled.fieldWidth(substr.length()))/2), row);
-    oled.print(substr);
-  }
-}
-
 // Update the connected oled display
 void updateDisplay() {
   oled.clear();
@@ -312,83 +206,19 @@ void setup() {
     Serial.begin(9600);
   // #endif
 
-  Wire.begin();
-  // Wire.setClock(400000L);
-
-  #if RST_PIN >= 0
-    oled.begin(&Adafruit128x64, I2C_ADDRESS, RST_PIN);
-  #else  // RST_PIN >= 0
-    oled.begin(&Adafruit128x64, I2C_ADDRESS);
-  #endif // RST_PIN >= 0
-
-  // oled.setFont(Iain5x7); // proportional
-  // oled.setFont(Callibri15); // proportional
-  // oled.setFont(Arial14);// proportional
-  // oled.setFont(Callibri11_bold);// proportional
-  // oled.setFont(TimesNewRoman13);// proportional
-  oled.setFont(Adafruit5x7);
-  // oled.setFont(fixed_bold10x15);
-  // oled.setFont(font5x7);
-  // oled.setFont(font8x8);
-  // oled.setFont(lcd5x7);
-  // oled.setFont(newbasic3x5);
-  // oled.setFont(Stang5x7);
-  // oled.setFont(System5x7);
-  // oled.setFont(Wendy3x5);
-  // oled.setFont(X11fixed7x14);
-  // oled.setFont(X11fixed7x14B);
-  // oled.setFont(ZevvPeep8x16);
-
-    displayHeightInRows = (oled.displayHeight() / oled.fontHeight()) - 1;
-    displayWidthInColumns = (oled.displayWidth() / oled.fontWidth()) - 1;
-
-    oled.clear();
-    oled.print("Booting");
-    for (uint8_t i = 0; i < 10; i++)
-    {
-      delay(200);
-      oled.print(".");
-  }
+  displaySetup();
 
   updateDisplay();
 
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LED_BUILTIN_OFF);
 
-  pinMode(MIDDLE_PIN, INPUT_PULLUP);
-  pinMode(UP_PIN, INPUT_PULLUP);
-  pinMode(DOWN_PIN, INPUT_PULLUP);
-  pinMode(LEFT_PIN, INPUT_PULLUP);
-  pinMode(RIGHT_PIN, INPUT_PULLUP);
-  pinMode(ENC_PIN_A, INPUT_PULLUP);
-  pinMode(ENC_PIN_B, INPUT_PULLUP);
-
-  // Consumer.begin();
+  buttonsSetup();
 
   Keyboard.begin();
   Mouse.begin();
 
-  // https: //github.com/brianlow/Rotary/blob/master/examples/InterruptProMicro/InterruptProMicro.ino
-  encoder.begin();
-  PCICR |= (1 << PCIE0);
-  PCMSK0 |= (1 << PCINT4) | (1 << PCINT5);
-  sei();
-}
-
-// https: //github.com/brianlow/Rotary/blob/master/examples/InterruptProMicro/InterruptProMicro.ino
-bool encoderTurnedCW = false;
-bool encoderTurnedCCW = false;
-ISR(PCINT0_vect) {
-  unsigned char result = encoder.process();
-  if (result == DIR_NONE) {
-    // do nothing
-  }
-  else if (result == DIR_CW) {
-    encoderTurnedCW = true;
-  }
-  else if (result == DIR_CCW) {
-    encoderTurnedCCW = true;
-  }
+  encoderSetup();
 }
 
 #define OUTPUT_EVERY 5000
@@ -475,12 +305,8 @@ void changeModeMessage() {
 }
 
 void loop() {
-  middleButton.read();
-  upButton.read();
-  downButton.read();
-  leftButton.read();
-  rightButton.read();
-
+  readButtons();
+  
   unsigned long currentMillis = millis();
 
   if (nextOutput < currentMillis) {
