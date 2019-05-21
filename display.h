@@ -11,6 +11,57 @@ SSD1306AsciiWire oled;
 uint8_t displayHeightInRows;
 uint8_t displayWidthInColumns;
 
+const char *fontName[] = {
+    "Adafruit5x7",
+    // "Iain5x7", // proportional
+    // "Callibri15",      // proportional
+    // "Arial14",         // proportional
+    // "Callibri11_bold", // proportional
+    // "TimesNewRoman13", // proportional
+    // "fixed_bold10x15",
+    // "font5x7",
+    "font8x8",
+    // "lcd5x7",
+    // "newbasic3x5",
+    // "Stang5x7",
+    // "System5x7",
+    "Wendy3x5",
+    // "X11fixed7x14",
+    // "X11fixed7x14B",
+    // "ZevvPeep8x16"
+};
+
+const uint8_t *fontList[] = {
+    Adafruit5x7,
+    // Iain5x7, // proportional
+    // Callibri15, // proportional
+    // Arial14, // proportional
+    // Callibri11_bold, // proportional
+    // TimesNewRoman13, // proportional
+    // fixed_bold10x15,
+    // font5x7,
+    font8x8,
+    // lcd5x7,
+    // newbasic3x5,
+    // Stang5x7,
+    // System5x7,
+    Wendy3x5,
+    // X11fixed7x14,
+    // X11fixed7x14B,
+    // ZevvPeep8x16
+};
+
+uint8_t nFont = sizeof(fontList) / sizeof(uint8_t *);
+uint8_t currentFont = 0;
+
+void setFont(uint8_t fontNumber) {
+  oled.setFont(fontList[fontNumber]);
+  displayHeightInRows = (oled.displayHeight() / oled.fontHeight()) - 1;
+
+  // displayWidthInColumns = (oled.displayWidth() / oled.fontWidth()) - 1;
+  displayHeightInRows = oled.displayRows();
+}
+
 // to be called from inside main setup()
 void displaySetup() {
   Wire.begin();
@@ -22,34 +73,10 @@ void displaySetup() {
     oled.begin(&Adafruit128x64, I2C_ADDRESS);
   #endif // RST_PIN >= 0
 
-  // oled.setFont(Iain5x7); // proportional
-  // oled.setFont(Callibri15); // proportional
-  // oled.setFont(Arial14);// proportional
-  // oled.setFont(Callibri11_bold);// proportional
-  // oled.setFont(TimesNewRoman13);// proportional
-  oled.setFont(Adafruit5x7);
-  // oled.setFont(fixed_bold10x15);
-  // oled.setFont(font5x7);
-  // oled.setFont(font8x8);
-  // oled.setFont(lcd5x7);
-  // oled.setFont(newbasic3x5);
-  // oled.setFont(Stang5x7);
-  // oled.setFont(System5x7);
-  // oled.setFont(Wendy3x5);
-  // oled.setFont(X11fixed7x14);
-  // oled.setFont(X11fixed7x14B);
-  // oled.setFont(ZevvPeep8x16);
-
-  displayHeightInRows = (oled.displayHeight() / oled.fontHeight()) - 1;
-  displayWidthInColumns = (oled.displayWidth() / oled.fontWidth()) - 1;
+  setFont(currentFont);
 
   oled.clear();
-  oled.print("Booting");
-  for (uint8_t i = 0; i < 10; i++) {
-    delay(200);
-    oled.print(".");
-  }
-
+  oled.print(F("Display\nInitialized"));
 }
 
 // Print to oled left-justified with newline support
@@ -77,7 +104,8 @@ void oledPrintRightJustify(String msg, uint8_t row) {
   String substr = "";
   for (uint8_t i = 0; i < msg.length(); i++) {
     if (msg[i] == '\n') {
-      oled.setCursor(((oled.displayWidth() - oled.fieldWidth(substr.length()))), row);
+      int8_t col = ((oled.displayWidth() - oled.fieldWidth(substr.length()))); // signed!
+      oled.setCursor(col < 0 ? 0 : col, row);
       oled.print(substr);
       substr = "";
       row++;
@@ -86,7 +114,8 @@ void oledPrintRightJustify(String msg, uint8_t row) {
     }
   }
   if (substr.length() > 0) {
-    oled.setCursor(((oled.displayWidth() - oled.fieldWidth(substr.length()))), row);
+    int8_t col = ((oled.displayWidth() - oled.fieldWidth(substr.length()))); // signed!
+    oled.setCursor(col < 0 ? 0 : col, row);
     oled.print(substr);
   }
 }
@@ -96,7 +125,8 @@ void oledPrintCentered(String msg, uint8_t row) {
   String substr = "";
   for (uint8_t i = 0; i < msg.length(); i++) {
     if (msg[i] == '\n') {
-      oled.setCursor(((oled.displayWidth() - oled.fieldWidth(substr.length()))/2), row);
+      int8_t col = ((oled.displayWidth() - oled.fieldWidth(substr.length())) / 2); // signed!
+      oled.setCursor(col < 0 ? 0 : col, row);
       oled.print(substr);
       substr = "";
       row++;
@@ -105,7 +135,8 @@ void oledPrintCentered(String msg, uint8_t row) {
     }
   }
   if (substr.length() > 0) {
-    oled.setCursor(((oled.displayWidth() - oled.fieldWidth(substr.length()))/2), row);
+    int8_t col = ((oled.displayWidth() - oled.fieldWidth(substr.length())) / 2); // signed!
+    oled.setCursor(col < 0 ? 0 : col, row);
     oled.print(substr);
   }
 }

@@ -14,12 +14,17 @@
 
 #define USE_SERIAL
 #ifdef USE_SERIAL
+  #define debugf(msg) Serial.print(F(msg))
   #define debug(msg) Serial.print(msg)
+  #define debugfln(msg) Serial.println(F(msg))
   #define debugln(msg) Serial.println(msg)
   #define debuglnfmt(msg, fmt) Serial.println(msg, fmt)
 #else
+  #define debugf(msg)
   #define debug(msg)
+  #define debugfmt(msg, fmt)
   #define debugln(msg)
+  #define debugfln(msg)
   #define debuglnfmt(msg, fmt)
 #endif
 
@@ -159,7 +164,7 @@ controlMode previousMode() {
 void updateDisplay() {
   oled.clear();
 
-  oledPrintCentered(currentMode().name + " Mode", 0);
+  oledPrintCentered(currentMode().name + F(" Mode"), 0);
 
   // oled.setCursor(0, 1);
   // oled.print("01234567890123456789012345678901234567890");
@@ -174,20 +179,21 @@ void updateDisplay() {
   oledPrintRightJustify(currentMode().right.name, 2);
 
   // wheel actions
-  oledPrintCentered((currentMode().wheelCW.name +  " .. " + currentMode().wheelCCW.name), displayHeightInRows - 3);
+  uint8_t wheelActionRow = displayHeightInRows > 7 ? displayHeightInRows - 3 : displayHeightInRows - 2;
+  oledPrintCentered((currentMode().wheelCW.name + F(" .. ") + currentMode().wheelCCW.name), wheelActionRow);
 
   // mode quick-toggle
   if (previousModeIndex == currentModeIndex) {
     if (currentModeIndex != toggleModeIndex) {
-      oledPrintCentered(toggleMode().name + " ->", displayHeightInRows - 1);
+      oledPrintCentered(toggleMode().name + F(" ->"), displayHeightInRows - 1);
     } else {
-      oledPrintCentered("--", displayHeightInRows - 1);
+      oledPrintCentered(F("--"), displayHeightInRows - 1);
     }
   } else {
     if (previousModeIndex != toggleModeIndex) {
       oledPrintCentered("<- " + previousMode().name, displayHeightInRows - 1);
     } else {
-      oledPrintCentered(toggleMode().name + " ->", displayHeightInRows - 1);
+      oledPrintCentered(toggleMode().name + F(" ->"), displayHeightInRows - 1);
     }
   }
 }
@@ -201,19 +207,40 @@ void updateLastAction() {
 }
 
 void setup() {
-  // #ifdef USE_SERIAL
-    // leave serial enabled so we can reprogram properly
+  #ifdef USE_SERIAL
     Serial.begin(9600);
-  // #endif
+  #endif
 
   displaySetup();
+
+  buttonsSetup();
+
+  // Put this in main setup() to give you a chance to reprogram the MCU in case
+  // things get wedged; just hold th middle button while booting and the MCU
+  // Will enable the serial port and then just wait forever
+  middleButton.read();
+  if (middleButton.isPressed()) {
+    Serial.begin(9600);
+    oled.clear();
+    oled.print(F("Waiting for\nProgrammer\n"));
+    uint8_t dotCounter = 0;
+    while (true) {
+      Serial.print(millis());
+      Serial.println(F(" Programming Mode - Waiting for Programmer..."));
+
+      if (dotCounter++ > 10) {
+        dotCounter = 0;
+        oled.clearField(0, 2, 10);
+      }
+      oled.print(".");
+      delay(1000);
+    }
+  }
 
   updateDisplay();
 
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LED_BUILTIN_OFF);
-
-  buttonsSetup();
 
   Keyboard.begin();
   Mouse.begin();
@@ -230,9 +257,9 @@ void sendAction(controlAction actionToSend)
   digitalWrite(LED_BUILTIN, LED_BUILTIN_ON);
   updateLastAction();
 
-  debug("Sending key action '");
+  debugf("Sending key action '");
   debug(actionToSend.name);
-  debugln("'");
+  debugfln("'");
 
   for (uint8_t i = 0; i < MAX_KEYS_PER_ACTION; i++) {
     if (actionToSend.keys[i]) {
@@ -248,23 +275,23 @@ void sendAction(controlAction actionToSend)
 
   if (bitRead(actionToSend.modeMask, 7)) {
     if (bitRead(actionToSend.modeMask, 6)) {
-      debugln("scrolling down");
+      debugfln("scrolling down");
       Mouse.move(0, 0, MOUSE_SCROLL_AMOUNT);
     }
     if (bitRead(actionToSend.modeMask, 5)) {
-      debugln("scrolling up");
+      debugfln("scrolling up");
       Mouse.move(0, 0, -MOUSE_SCROLL_AMOUNT);
     }
     if (bitRead(actionToSend.modeMask, 4)) {
-      debugln("left click");
+      debugfln("left click");
       Mouse.click(MOUSE_LEFT);
     }
     if (bitRead(actionToSend.modeMask, 3)) {
-      debugln("right click");
+      debugfln("right click");
       Mouse.click(MOUSE_RIGHT);
     }
     if (bitRead(actionToSend.modeMask, 2)) {
-      debugln("middle click");
+      debugfln("middle click");
       Mouse.click(MOUSE_MIDDLE);
     }
   }
@@ -273,9 +300,9 @@ void sendAction(controlAction actionToSend)
 void releaseAction(controlAction actionToRelease) {
   digitalWrite(LED_BUILTIN, LED_BUILTIN_OFF);
 
-  debug("Releasing key action '");
+  debugf("Releasing key action '");
   debug(actionToRelease.name);
-  debugln("'");
+  debugfln("'");
 
   Keyboard.releaseAll();
 }
@@ -286,7 +313,7 @@ void sendActionAndRelease(controlAction actionToSend) {
   sendAction(actionToSend);
 
   if (actionToSend.modeMask & LONG_KEY_DOWN_TIME) {
-    debugln("Using KEY_DOWN_TIME_LONG");
+    debugfln("Using KEY_DOWN_TIME_LONG");
     delay(KEY_DOWN_TIME_LONG);
   } else {
     delay(KEY_DOWN_TIME_REGULAR);
@@ -297,30 +324,42 @@ void sendActionAndRelease(controlAction actionToSend) {
 }
 
 void changeModeMessage() {
-  debug("Changing control mode to ");
+  debugf("Changing control mode to ");
   debug(currentModeIndex);
-  debug(" '");
+  debugf(" '");
   debug(currentMode().name);
-  debugln("'");
+  debugfln("'");
 }
 
 void loop() {
   readButtons();
-  
+
   unsigned long currentMillis = millis();
 
   if (nextOutput < currentMillis) {
     nextOutput = currentMillis + OUTPUT_EVERY;
 
     debug(currentMillis);
-    debug(" Current Control Mode is '");
+    debugf(" Current Control Mode is '");
     debug(currentMode().name);
-    debugln("'");
+    debugfln("'");
 
     // updateDisplay();
   }
 
-  if (leftButton.wasPressed()) {
+  if (upButton.isPressed() && middleButton.wasPressed()) {
+    if (currentFont++ >= nFont-1)
+      currentFont = 0;
+
+    setFont(currentFont);
+    oled.clear();
+    oled.print(F("Font: "));
+    oled.print(fontName[currentFont]);
+    delay(1000);
+    updateDisplay();
+  }
+  else if (leftButton.wasPressed())
+  {
     sendAction(currentMode().left);
   } else if (leftButton.wasReleased()) {
     releaseAction(currentMode().left);
@@ -349,17 +388,17 @@ void loop() {
 
     if (currentModeIndex == toggleModeIndex) {
       if (previousModeIndex != toggleModeIndex) {
-        debugln("Returning to previous mode");
+        debugfln("Returning to previous mode");
         currentModeIndex = previousModeIndex;
         changeModeMessage();
         updateDisplay();
       } else {
-        debugln("Toggle mode and previous mode are the same");
+        debugfln("Toggle mode and previous mode are the same");
       }
     } else {
-      debug("Temporary toggle to '");
+      debugf("Temporary toggle to '");
       debug(toggleMode().name);
-      debugln("'");
+      debugfln("'");
 
       currentModeIndex = toggleModeIndex;
       updateDisplay();
@@ -378,7 +417,7 @@ void loop() {
   }
 
   if (inToggleMode() && (lastAction < currentMillis - TOGGLE_MODE_EXPIRES_IN)) {
-    debugln("Toggle Mode expired; Returning to previous mode");
+    debugfln("Toggle Mode expired; Returning to previous mode");
     currentModeIndex = previousModeIndex;
     changeModeMessage();
     updateDisplay();
