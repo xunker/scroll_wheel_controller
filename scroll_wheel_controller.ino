@@ -349,7 +349,7 @@ void loop() {
 
     // updateDisplay();
 
-    if (!screensaverEnabled && (lastAction < currentMillis - SCREENSAVER_STARTS_IN)) {
+    if (!screensaverEnabled && (lastAction > SCREENSAVER_STARTS_IN) && (lastAction < currentMillis - SCREENSAVER_STARTS_IN)) {
       screensaverEnabled = true;
     }
 
