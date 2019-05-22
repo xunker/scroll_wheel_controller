@@ -85,8 +85,6 @@ Windows, or for specific apps. Do this by long-pressing the mode select button.
 Encoder wheel acceleration. E.g. in VLC mode, use faster scrub keypress the
 longer I continuously rotate the wheel.
 
-Screen saver/screen blanking on inactivity
-
 */
 controlMode controlModeList[NUMBER_OF_MODES] = {
     {{"Volume"}, {"Vol"},
@@ -144,6 +142,11 @@ unsigned long lastAction = 0;
 // If in toggle mode and no action performed, return to previous mode in this many milliseconds
 #define TOGGLE_MODE_EXPIRES_IN 10000 // ms
 
+// How long until the screen saver starts?
+#define SCREENSAVER_STARTS_IN 60000 // ms
+
+bool screensaverEnabled = false;
+
 controlMode currentMode() {
   return controlModeList[currentModeIndex];
 }
@@ -200,6 +203,10 @@ bool inToggleMode() {
 
 void updateLastAction() {
   lastAction = millis();
+  if (screensaverEnabled) {
+    screensaverEnabled = false;
+    updateDisplay();
+  }
 }
 
 void setup() {
@@ -341,6 +348,16 @@ void loop() {
     debugfln("'");
 
     // updateDisplay();
+
+    if (!screensaverEnabled && (lastAction < currentMillis - SCREENSAVER_STARTS_IN)) {
+      screensaverEnabled = true;
+    }
+
+    if (screensaverEnabled) {
+      oled.clear();
+      oled.setCursor(random(0, oled.displayWidth()-oled.fieldWidth(11)), random(0, displayHeightInRows));
+      oled.print(F("Screensaver"));
+    }
   }
 
   if (upButton.isPressed() && middleButton.wasPressed()) {

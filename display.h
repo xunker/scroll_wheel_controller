@@ -56,9 +56,10 @@ uint8_t currentFont = 0;
 
 void setFont(uint8_t fontNumber) {
   oled.setFont(fontList[fontNumber]);
-  displayHeightInRows = (oled.displayHeight() / oled.fontHeight()) - 1;
+  // displayHeightInRows = (oled.displayHeight() / oled.fontHeight()) - 1;
 
   // displayWidthInColumns = (oled.displayWidth() / oled.fontWidth()) - 1;
+  displayWidthInColumns = oled.displayWidth();
   displayHeightInRows = oled.displayRows();
 }
 
