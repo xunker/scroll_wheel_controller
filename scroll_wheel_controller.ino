@@ -401,15 +401,16 @@ void loop() {
     }
   }
 
-  if (encoderTurnedCCW) {
+  if (encoderTurnedCCW > 0) {
+    debugf("CCW: ");
+    debugln(encoderTurnedCCW);
+    encoderTurnedCCW--;
     sendActionAndRelease(currentMode().wheelCCW);
-  } else if (encoderTurnedCW) {
+  } else if (encoderTurnedCW > 0) {
+    debugf("CW: ");
+    debugln(encoderTurnedCW);
+    encoderTurnedCW--;
     sendActionAndRelease(currentMode().wheelCW);
-  }
-
-  if (encoderTurnedCW || encoderTurnedCCW) {
-    encoderTurnedCCW = false;
-    encoderTurnedCW = false;
   }
 
   if (inToggleMode() && (lastAction < currentMillis - TOGGLE_MODE_EXPIRES_IN)) {

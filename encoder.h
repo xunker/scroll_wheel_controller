@@ -7,7 +7,7 @@ Rotary encoder = Rotary(ENC_PIN_A, ENC_PIN_B);
 void encoderSetup() {
   pinMode(ENC_PIN_A, INPUT_PULLUP);
   pinMode(ENC_PIN_B, INPUT_PULLUP);
-  
+
   // https: //github.com/brianlow/Rotary/blob/master/examples/InterruptProMicro/InterruptProMicro.ino
   encoder.begin();
   PCICR |= (1 << PCIE0);
@@ -16,17 +16,17 @@ void encoderSetup() {
 }
 
 // https: //github.com/brianlow/Rotary/blob/master/examples/InterruptProMicro/InterruptProMicro.ino
-bool encoderTurnedCW = false;
-bool encoderTurnedCCW = false;
+volatile uint8_t encoderTurnedCW = 0;
+volatile uint8_t encoderTurnedCCW = 0;
 ISR(PCINT0_vect) {
   unsigned char result = encoder.process();
   if (result == DIR_NONE) {
     // do nothing
   }
   else if (result == DIR_CW) {
-    encoderTurnedCW = true;
+    encoderTurnedCW++;
   }
   else if (result == DIR_CCW) {
-    encoderTurnedCCW = true;
+    encoderTurnedCCW++;
   }
 }
