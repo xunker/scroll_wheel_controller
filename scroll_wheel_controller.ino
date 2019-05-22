@@ -68,6 +68,7 @@ combine modeMasks using |
 
 struct controlMode {
   const String name;
+  const String wheelName; // name of scroll wheel action
   controlAction left;
   controlAction right;
   controlAction wheelCW;
@@ -75,24 +76,11 @@ struct controlMode {
   controlAction middle;
 };
 
-#define NUMBER_OF_MODES 5
+#define NUMBER_OF_MODES 6
 /*
-
-Ideas for other control modes:
-  CONSUMER_BRIGHTNESS_UP
-  CONSUMER_BRIGHTNESS_DOWN
-  CONSUMER_SCREENSAVER
-  CONSUMER_POWER
-  CONSUMER_SLEEP
-  HID_CONSUMER_RESET
-
-  Switch application and application windows
 
 Option to define/switch "control sets", e.g. one set for Macos and one for
 Windows, or for specific apps. Do this by long-pressing the mode select button.
-
-When on toggle mode, automatically return to previous mode if no actions after
-N seconds.
 
 Encoder wheel acceleration. E.g. in VLC mode, use faster scrub keypress the
 longer I continuously rotate the wheel.
@@ -101,40 +89,48 @@ Screen saver/screen blanking on inactivity
 
 */
 controlMode controlModeList[NUMBER_OF_MODES] = {
-    {{"Volume"},
-     {"--", NULL, NULL, NULL, NULL},
-     {"--", NULL, NULL, NULL, NULL},
-     {"- Vol", NULL, NULL, NULL, MEDIA_VOLUME_DOWN},
-     {"Vol +", NULL, NULL, NULL, MEDIA_VOLUME_UP},
+    {{"Volume"}, {"Vol"},
+     {""},
+     {""},
+     {"-", NULL, NULL, NULL, MEDIA_VOLUME_DOWN},
+     {"+", NULL, NULL, NULL, MEDIA_VOLUME_UP},
      {"Mute", NULL, NULL, NULL, MEDIA_VOLUME_MUTE}},
 
-    {{"Media"},
+    {{"Media"}, {"Seek"},
      {"Prev\nTrack", NULL, NULL, NULL, MEDIA_PREVIOUS},
      {"Next\nTrack", NULL, NULL, NULL, MEDIA_NEXT},
-     {"< Seek", NULL, NULL, NULL, MEDIA_REWIND, LONG_KEY_DOWN_TIME},
-     {"Seek >", NULL, NULL, NULL, MEDIA_FAST_FORWARD, LONG_KEY_DOWN_TIME},
+     {"<", NULL, NULL, NULL, MEDIA_REWIND, LONG_KEY_DOWN_TIME},
+     {">", NULL, NULL, NULL, MEDIA_FAST_FORWARD, LONG_KEY_DOWN_TIME},
      {"Play/\nPause", NULL, NULL, NULL, MEDIA_PLAY_PAUSE}},
 
-    {{"VLC"},
+    {{"VLC"}, {"Scrub"},
      {"Prev\nTrack", KEY_LEFT_GUI, KEY_LEFT_ARROW, NULL, NULL},
      {"Next\nTrack", KEY_LEFT_GUI, KEY_RIGHT_ARROW, NULL, NULL},
-     {"< Scrub", KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_LEFT_ARROW, NULL},
-     {"Scrub >", KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_RIGHT_ARROW, NULL},
+     {"<", KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_LEFT_ARROW, NULL},
+     {">", KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_RIGHT_ARROW, NULL},
      {"Play/\nPause", KEY_SPACE, NULL, NULL, NULL}},
 
-    {{"Mouse"},
+    {{"Mouse"}, {"Scroll"},
      {"Left\nClick", NULL, NULL, NULL, NULL, MOUSE_LEFT_CLICK},
      {"Right\nClick", NULL, NULL, NULL, NULL, MOUSE_RIGHT_CLICK},
-     {"^ Scroll", NULL, NULL, NULL, NULL, MOUSE_SCROLL_NEGATIVE},
-     {"Scroll v", NULL, NULL, NULL, NULL, MOUSE_SCROLL_POSITIVE},
+     {"^", NULL, NULL, NULL, NULL, MOUSE_SCROLL_NEGATIVE},
+     {"v", NULL, NULL, NULL, NULL, MOUSE_SCROLL_POSITIVE},
      {"Middle\nClick", NULL, NULL, NULL, NULL, MOUSE_MIDDLE_CLICK}},
 
-    {{"Navigation"},
+    {{"Navigation"}, {"Arrow"},
      {"Next\nPage", KEY_LEFT_GUI, KEY_LEFT_BRACE, NULL, NULL},  // CONSUMER_BROWSER_BACK maybe
      {"Prev\nPage", KEY_LEFT_GUI, KEY_RIGHT_BRACE, NULL, NULL}, // CONSUMER_BROWSER_FORWARD maybe
-     {"^ Arrow", KEY_UP_ARROW, NULL, NULL, NULL},
-     {"Arrow v", KEY_DOWN_ARROW, NULL, NULL, NULL},
-     {"Enter", KEY_ENTER, NULL, NULL, NULL}}};
+     {"^", KEY_UP_ARROW, NULL, NULL, NULL},
+     {"v", KEY_DOWN_ARROW, NULL, NULL, NULL},
+     {"Enter", KEY_ENTER, NULL, NULL, NULL}},
+
+    {{"System"}, {"Brightness"},
+     {"", NULL, NULL, NULL, NULL},
+     {"", NULL, NULL, NULL, NULL},
+     {"-", NULL, NULL, NULL, CONSUMER_BRIGHTNESS_DOWN},
+     {"+", NULL, NULL, NULL, CONSUMER_BRIGHTNESS_UP},
+     {"", NULL, NULL, NULL, NULL}},
+};
 
 uint8_t currentModeIndex = 0;
 
@@ -180,7 +176,7 @@ void updateDisplay() {
 
   // wheel actions
   uint8_t wheelActionRow = displayHeightInRows > 7 ? displayHeightInRows - 3 : displayHeightInRows - 2;
-  oledPrintCentered((currentMode().wheelCW.name + F(" .. ") + currentMode().wheelCCW.name), wheelActionRow);
+  oledPrintCentered((currentMode().wheelCW.name + F(" ") + currentMode().wheelName + F(" ") + currentMode().wheelCCW.name), wheelActionRow);
 
   // mode quick-toggle
   if (previousModeIndex == currentModeIndex) {
