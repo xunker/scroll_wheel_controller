@@ -12,8 +12,8 @@
 
 #include "display.h"
 
-#define USE_SERIAL
-#ifdef USE_SERIAL
+// #define ENABLE_DEBUGGING
+#ifdef ENABLE_DEBUGGING
   #define debugf(msg) Serial.print(F(msg))
   #define debug(msg) Serial.print(msg)
   #define debugfln(msg) Serial.println(F(msg))
@@ -63,7 +63,7 @@ combine modeMasks using |
 #define MOUSE_RIGHT_CLICK MOUSE_EVENT | 0b00001000
 #define MOUSE_MIDDLE_CLICK MOUSE_EVENT | 0b00000100
 
-#define KEY_DOWN_TIME_REGULAR 50 // milliseconds
+#define KEY_DOWN_TIME_REGULAR 10 // milliseconds
 #define KEY_DOWN_TIME_LONG 1100  // milliseconds
 
 struct controlMode {
@@ -203,7 +203,7 @@ void updateLastAction() {
 }
 
 void setup() {
-  #ifdef USE_SERIAL
+  #ifdef ENABLE_DEBUGGING
     Serial.begin(9600);
   #endif
 
