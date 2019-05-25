@@ -139,6 +139,7 @@ uint8_t toggleModeIndex = 0;
 
 // when did the user last perform an action?
 unsigned long lastAction = 0;
+
 // If in toggle mode and no action performed, return to previous mode in this many milliseconds
 #define TOGGLE_MODE_EXPIRES_IN 10000 // ms
 
@@ -355,8 +356,8 @@ void loop() {
 
     if (screensaverEnabled) {
       oled.clear();
-      oled.setCursor(random(0, oled.displayWidth()-oled.fieldWidth(11)), random(0, displayHeightInRows));
-      oled.print(F("Screensaver"));
+      oled.setCursor(random(0, oled.displayWidth()-oled.fieldWidth(12)), random(0, displayHeightInRows));
+      oled.print(F("Screen saver"));
     }
   }
 
