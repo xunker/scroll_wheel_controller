@@ -122,19 +122,19 @@ controlMode controlModeList[NUMBER_OF_MODES] = {
      {"v", NULL, NULL, NULL, NULL, MOUSE_SCROLL_POSITIVE},
      {"Middle\nClick", NULL, NULL, NULL, NULL, MOUSE_MIDDLE_CLICK}},
 
-    {{"Navigation"}, {"Arrow"},
-     {"Next\nPage", KEY_LEFT_GUI, KEY_LEFT_BRACE, NULL, NULL},  // CONSUMER_BROWSER_BACK maybe
-     {"Prev\nPage", KEY_LEFT_GUI, KEY_RIGHT_BRACE, NULL, NULL}, // CONSUMER_BROWSER_FORWARD maybe
-     {"^", KEY_UP_ARROW, NULL, NULL, NULL},
-     {"v", KEY_DOWN_ARROW, NULL, NULL, NULL},
-     {"Enter", KEY_ENTER, NULL, NULL, NULL}},
+    // {{"Navigation"}, {"Arrow"},
+    //  {"Next\nPage", KEY_LEFT_GUI, KEY_LEFT_BRACE, NULL, NULL},  // CONSUMER_BROWSER_BACK maybe
+    //  {"Prev\nPage", KEY_LEFT_GUI, KEY_RIGHT_BRACE, NULL, NULL}, // CONSUMER_BROWSER_FORWARD maybe
+    //  {"^", KEY_UP_ARROW, NULL, NULL, NULL},
+    //  {"v", KEY_DOWN_ARROW, NULL, NULL, NULL},
+    //  {"Enter", KEY_ENTER, NULL, NULL, NULL}},
 
-    // {{"System"}, {"Brightness"},
-    //  {"", NULL, NULL, NULL, NULL},
-    //  {"", NULL, NULL, NULL, NULL},
-    //  {"-", NULL, NULL, NULL, CONSUMER_BRIGHTNESS_DOWN},
-    //  {"+", NULL, NULL, NULL, CONSUMER_BRIGHTNESS_UP},
-    //  {"", NULL, NULL, NULL, NULL}},
+    {{"System"}, {"Brightness"},
+     {"Ext\n-", KEY_SCROLL_LOCK, NULL, NULL, NULL}, // External Display
+     {"Ext\n+", KEY_PAUSE, NULL, NULL, NULL},       // External Display
+     {"-", NULL, NULL, NULL, CONSUMER_BRIGHTNESS_DOWN}, // Internal Display
+     {"+", NULL, NULL, NULL, CONSUMER_BRIGHTNESS_UP},   // Internal Display
+     {"", NULL, NULL, NULL, NULL}},
 };
 
 #define DEFAULT_MODE 1 // Mode to use upon startup
@@ -224,6 +224,8 @@ void setup() {
     Serial.begin(9600);
   #endif
 
+  mcuSetup();
+
   displaySetup();
 
   buttonsSetup();
@@ -252,9 +254,6 @@ void setup() {
 
   updateDisplay();
 
-  pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, LED_BUILTIN_OFF);
-
   Keyboard.begin();
   Mouse.begin();
 
@@ -267,7 +266,7 @@ unsigned long nextOutput = OUTPUT_EVERY;
 // Send action but don't release the keys
 void sendAction(controlAction actionToSend)
 {
-  digitalWrite(LED_BUILTIN, LED_BUILTIN_ON);
+  setIndicatorLed(1);
   updateLastAction();
 
   debugf("Sending key action '");
@@ -311,7 +310,7 @@ void sendAction(controlAction actionToSend)
 }
 
 void releaseAction(controlAction actionToRelease) {
-  digitalWrite(LED_BUILTIN, LED_BUILTIN_OFF);
+  setIndicatorLed(0);
 
   debugf("Releasing key action '");
   debug(actionToRelease.name);
