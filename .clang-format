@@ -1,0 +1,13 @@
+---
+BasedOnStyle: LLVM
+AccessModifierOffset: '-4'
+AllowShortIfStatementsOnASingleLine: 'false'
+BreakConstructorInitializersBeforeComma: 'true'
+BreakBeforeBraces: BS_Stroustrup
+ColumnLimit: '0'
+IndentCaseLabels: 'false'
+IndentWidth: '2'
+TabWidth: '2'
+UseTab: Never
+
+...
