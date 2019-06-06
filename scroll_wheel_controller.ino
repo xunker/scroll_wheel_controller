@@ -87,12 +87,19 @@ longer I continuously rotate the wheel.
 
 */
 controlMode controlModeList[NUMBER_OF_MODES] = {
-    {{"Volume"}, {"Vol"},
+    {{"Volume"}, {"Volume"},
      {""},
      {""},
      {"-", NULL, NULL, NULL, MEDIA_VOLUME_DOWN},
      {"+", NULL, NULL, NULL, MEDIA_VOLUME_UP},
      {"Mute", NULL, NULL, NULL, MEDIA_VOLUME_MUTE}},
+
+    {{"Media & Volume"}, {"Volume"},
+     {"Prev\nTrack", NULL, NULL, NULL, MEDIA_PREVIOUS},
+     {"Next\nTrack", NULL, NULL, NULL, MEDIA_NEXT},
+     {"-", NULL, NULL, NULL, MEDIA_VOLUME_DOWN},
+     {"+", NULL, NULL, NULL, MEDIA_VOLUME_UP},
+     {"Play/\nPause", NULL, NULL, NULL, MEDIA_PLAY_PAUSE}},
 
     {{"Media"}, {"Seek"},
      {"Prev\nTrack", NULL, NULL, NULL, MEDIA_PREVIOUS},
@@ -122,15 +129,17 @@ controlMode controlModeList[NUMBER_OF_MODES] = {
      {"v", KEY_DOWN_ARROW, NULL, NULL, NULL},
      {"Enter", KEY_ENTER, NULL, NULL, NULL}},
 
-    {{"System"}, {"Brightness"},
-     {"", NULL, NULL, NULL, NULL},
-     {"", NULL, NULL, NULL, NULL},
-     {"-", NULL, NULL, NULL, CONSUMER_BRIGHTNESS_DOWN},
-     {"+", NULL, NULL, NULL, CONSUMER_BRIGHTNESS_UP},
-     {"", NULL, NULL, NULL, NULL}},
+    // {{"System"}, {"Brightness"},
+    //  {"", NULL, NULL, NULL, NULL},
+    //  {"", NULL, NULL, NULL, NULL},
+    //  {"-", NULL, NULL, NULL, CONSUMER_BRIGHTNESS_DOWN},
+    //  {"+", NULL, NULL, NULL, CONSUMER_BRIGHTNESS_UP},
+    //  {"", NULL, NULL, NULL, NULL}},
 };
 
-uint8_t currentModeIndex = 0;
+#define DEFAULT_MODE 1 // Mode to use upon startup
+
+uint8_t currentModeIndex = DEFAULT_MODE;
 
 uint8_t previousModeIndex = currentModeIndex;
 
@@ -144,7 +153,7 @@ unsigned long lastAction = 0;
 #define TOGGLE_MODE_EXPIRES_IN 10000 // ms
 
 // How long until the screen saver starts?
-#define SCREENSAVER_STARTS_IN 60000 // ms
+#define SCREENSAVER_STARTS_IN 300000 // ms
 
 bool screensaverEnabled = false;
 
@@ -419,15 +428,15 @@ void loop() {
     }
   }
 
-  if (encoderTurnedCCW > 0) {
+  if (encoderTurned < 0) {
     debugf("CCW: ");
-    debugln(encoderTurnedCCW);
-    encoderTurnedCCW--;
+    debugln(encoderTurned);
+    encoderTurned++;
     sendActionAndRelease(currentMode().wheelCCW);
-  } else if (encoderTurnedCW > 0) {
+  } else if (encoderTurned > 0) {
     debugf("CW: ");
-    debugln(encoderTurnedCW);
-    encoderTurnedCW--;
+    debugln(encoderTurned);
+    encoderTurned--;
     sendActionAndRelease(currentMode().wheelCW);
   }
 

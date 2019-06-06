@@ -16,17 +16,16 @@ void encoderSetup() {
 }
 
 // https: //github.com/brianlow/Rotary/blob/master/examples/InterruptProMicro/InterruptProMicro.ino
-volatile uint8_t encoderTurnedCW = 0;
-volatile uint8_t encoderTurnedCCW = 0;
+volatile int8_t encoderTurned = 0; // -127 to +127
 ISR(PCINT0_vect) {
   unsigned char result = encoder.process();
   if (result == DIR_NONE) {
     // do nothing
   }
   else if (result == DIR_CW) {
-    encoderTurnedCW++;
+    encoderTurned++;
   }
   else if (result == DIR_CCW) {
-    encoderTurnedCCW++;
+    encoderTurned--;
   }
 }
