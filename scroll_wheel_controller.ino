@@ -85,56 +85,73 @@ Windows, or for specific apps. Do this by long-pressing the mode select button.
 Encoder wheel acceleration. E.g. in VLC mode, use faster scrub keypress the
 longer I continuously rotate the wheel.
 
+Format for controlMode is:
+
+{{"Mode Name"}, {"Scroll Wheel Function Name"},
+    {"Left Arrow Function Name", KEYCODE_1, KEYCODE_2, KEYCODE_3, CONSUMER_KEYCODE, modeMask},
+    {"Right Arrow Function Name", KEYCODE_1, KEYCODE_2, KEYCODE_3, CONSUMER_KEYCODE, modeMask},
+    {"CCW Scroll Wheel Action Name", KEYCODE_1, KEYCODE_2, KEYCODE_3, CONSUMER_KEYCODE, modeMask},
+    {"CW Scroll Wheel Action Name", KEYCODE_1, KEYCODE_2, KEYCODE_3, CONSUMER_KEYCODE, modeMask},
+    {"Centre Button Action Name", KEYCODE_1, KEYCODE_2, KEYCODE_3, CONSUMER_KEYCODE, modeMask}},
+
+Mode Name is required.
+Scroll Wheel Function Name optional.
+All other action Names are required for that action to work.
+If you want these actions to be ignored, you can leave the Name blank.
+
+All KEYCODE_* are optional; they will be sent and released simultaneously.
+CONSUMER_KEYCODE is optional; it will be sent and released along with KEYCODE_*.
+modeMask is optional; it controls button behavior and sending of mouse actions.
 */
 controlMode controlModeList[NUMBER_OF_MODES] = {
-    {{"Volume"}, {"Volume"},
-     {""},
-     {""},
-     {"-", NULL, NULL, NULL, MEDIA_VOLUME_DOWN},
-     {"+", NULL, NULL, NULL, MEDIA_VOLUME_UP},
-     {"Mute", NULL, NULL, NULL, MEDIA_VOLUME_MUTE}},
+  {{"Volume"}, {"Volume"},
+    {""},
+    {""},
+    {"-", NULL, NULL, NULL, MEDIA_VOLUME_DOWN},
+    {"+", NULL, NULL, NULL, MEDIA_VOLUME_UP},
+    {"Mute", NULL, NULL, NULL, MEDIA_VOLUME_MUTE}},
 
-    {{"Media & Volume"}, {"Volume"},
-     {"Prev\nTrack", NULL, NULL, NULL, MEDIA_PREVIOUS},
-     {"Next\nTrack", NULL, NULL, NULL, MEDIA_NEXT},
-     {"-", NULL, NULL, NULL, MEDIA_VOLUME_DOWN},
-     {"+", NULL, NULL, NULL, MEDIA_VOLUME_UP},
-     {"Play/\nPause", NULL, NULL, NULL, MEDIA_PLAY_PAUSE}},
+  {{"Media & Volume"}, {"Volume"},
+    {"Prev\nTrack", NULL, NULL, NULL, MEDIA_PREVIOUS},
+    {"Next\nTrack", NULL, NULL, NULL, MEDIA_NEXT},
+    {"-", NULL, NULL, NULL, MEDIA_VOLUME_DOWN},
+    {"+", NULL, NULL, NULL, MEDIA_VOLUME_UP},
+    {"Play/\nPause", NULL, NULL, NULL, MEDIA_PLAY_PAUSE}},
 
-    {{"Media"}, {"Seek"},
-     {"Prev\nTrack", NULL, NULL, NULL, MEDIA_PREVIOUS},
-     {"Next\nTrack", NULL, NULL, NULL, MEDIA_NEXT},
-     {"<", NULL, NULL, NULL, MEDIA_REWIND, LONG_KEY_DOWN_TIME},
-     {">", NULL, NULL, NULL, MEDIA_FAST_FORWARD, LONG_KEY_DOWN_TIME},
-     {"Play/\nPause", NULL, NULL, NULL, MEDIA_PLAY_PAUSE}},
+  {{"Media"}, {"Seek"},
+    {"Prev\nTrack", NULL, NULL, NULL, MEDIA_PREVIOUS},
+    {"Next\nTrack", NULL, NULL, NULL, MEDIA_NEXT},
+    {"<", NULL, NULL, NULL, MEDIA_REWIND, LONG_KEY_DOWN_TIME},
+    {">", NULL, NULL, NULL, MEDIA_FAST_FORWARD, LONG_KEY_DOWN_TIME},
+    {"Play/\nPause", NULL, NULL, NULL, MEDIA_PLAY_PAUSE}},
 
-    {{"VLC"}, {"Scrub"},
-     {"Prev\nTrack", KEY_LEFT_GUI, KEY_LEFT_ARROW, NULL, NULL},
-     {"Next\nTrack", KEY_LEFT_GUI, KEY_RIGHT_ARROW, NULL, NULL},
-     {"<", KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_LEFT_ARROW, NULL},
-     {">", KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_RIGHT_ARROW, NULL},
-     {"Play/\nPause", KEY_SPACE, NULL, NULL, NULL}},
+  {{"VLC"}, {"Scrub"},
+    {"Prev\nTrack", KEY_LEFT_GUI, KEY_LEFT_ARROW, NULL, NULL},
+    {"Next\nTrack", KEY_LEFT_GUI, KEY_RIGHT_ARROW, NULL, NULL},
+    {"<", KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_LEFT_ARROW, NULL},
+    {">", KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_RIGHT_ARROW, NULL},
+    {"Play/\nPause", KEY_SPACE, NULL, NULL, NULL}},
 
-    {{"Mouse"}, {"Scroll"},
-     {"Left\nClick", NULL, NULL, NULL, NULL, MOUSE_LEFT_CLICK},
-     {"Right\nClick", NULL, NULL, NULL, NULL, MOUSE_RIGHT_CLICK},
-     {"^", NULL, NULL, NULL, NULL, MOUSE_SCROLL_NEGATIVE},
-     {"v", NULL, NULL, NULL, NULL, MOUSE_SCROLL_POSITIVE},
-     {"Middle\nClick", NULL, NULL, NULL, NULL, MOUSE_MIDDLE_CLICK}},
+  {{"Mouse"}, {"Scroll"},
+    {"Left\nClick", NULL, NULL, NULL, NULL, MOUSE_LEFT_CLICK},
+    {"Right\nClick", NULL, NULL, NULL, NULL, MOUSE_RIGHT_CLICK},
+    {"^", NULL, NULL, NULL, NULL, MOUSE_SCROLL_NEGATIVE},
+    {"v", NULL, NULL, NULL, NULL, MOUSE_SCROLL_POSITIVE},
+    {"Middle\nClick", NULL, NULL, NULL, NULL, MOUSE_MIDDLE_CLICK}},
 
-    // {{"Navigation"}, {"Arrow"},
-    //  {"Next\nPage", KEY_LEFT_GUI, KEY_LEFT_BRACE, NULL, NULL},  // CONSUMER_BROWSER_BACK maybe
-    //  {"Prev\nPage", KEY_LEFT_GUI, KEY_RIGHT_BRACE, NULL, NULL}, // CONSUMER_BROWSER_FORWARD maybe
-    //  {"^", KEY_UP_ARROW, NULL, NULL, NULL},
-    //  {"v", KEY_DOWN_ARROW, NULL, NULL, NULL},
-    //  {"Enter", KEY_ENTER, NULL, NULL, NULL}},
+  // {{"Navigation"}, {"Arrow"},
+  //  {"Next\nPage", KEY_LEFT_GUI, KEY_LEFT_BRACE, NULL, NULL},  // CONSUMER_BROWSER_BACK maybe
+  //  {"Prev\nPage", KEY_LEFT_GUI, KEY_RIGHT_BRACE, NULL, NULL}, // CONSUMER_BROWSER_FORWARD maybe
+  //  {"^", KEY_UP_ARROW, NULL, NULL, NULL},
+  //  {"v", KEY_DOWN_ARROW, NULL, NULL, NULL},
+  //  {"Enter", KEY_ENTER, NULL, NULL, NULL}},
 
-    {{"System"}, {"Brightness"},
-     {"Ext\n-", KEY_SCROLL_LOCK, NULL, NULL, NULL}, // External Display
-     {"Ext\n+", KEY_PAUSE, NULL, NULL, NULL},       // External Display
-     {"-", NULL, NULL, NULL, CONSUMER_BRIGHTNESS_DOWN}, // Internal Display
-     {"+", NULL, NULL, NULL, CONSUMER_BRIGHTNESS_UP},   // Internal Display
-     {"", NULL, NULL, NULL, NULL}},
+  {{"System"}, {"Brightness"},
+    {"Ext\n-", KEY_SCROLL_LOCK}, // External Display
+    {"Ext\n+", KEY_PAUSE},       // External Display
+    {"-", NULL, NULL, NULL, CONSUMER_BRIGHTNESS_DOWN}, // Internal Display
+    {"+", NULL, NULL, NULL, CONSUMER_BRIGHTNESS_UP},   // Internal Display
+    {"", NULL, NULL, NULL, NULL}},
 };
 
 #define DEFAULT_MODE 1 // Mode to use upon startup
@@ -343,6 +360,30 @@ void changeModeMessage() {
   debugfln("'");
 }
 
+void returnToPreviousMode() {
+  debugfln("Returning to previous mode");
+  currentModeIndex = previousModeIndex;
+  changeModeMessage();
+  updateDisplay();
+}
+
+void toggleToggleMode() {
+  if (currentModeIndex == toggleModeIndex) {
+    if (previousModeIndex != toggleModeIndex) {
+      returnToPreviousMode();
+    } else {
+      debugfln("Toggle mode and previous mode are the same");
+    }
+  } else {
+    debugf("Temporary toggle to '");
+    debug(toggleMode().name);
+    debugfln("'");
+
+    currentModeIndex = toggleModeIndex;
+    updateDisplay();
+  }
+}
+
 void loop() {
   readButtons();
 
@@ -379,9 +420,7 @@ void loop() {
     oled.print(fontName[currentFont]);
     delay(1000);
     updateDisplay();
-  }
-  else if (leftButton.wasPressed())
-  {
+  } else if (leftButton.wasPressed()) {
     sendAction(currentMode().left);
   } else if (leftButton.wasReleased()) {
     releaseAction(currentMode().left);
@@ -408,23 +447,7 @@ void loop() {
   } else if (downButton.wasPressed()) {
     updateLastAction();
 
-    if (currentModeIndex == toggleModeIndex) {
-      if (previousModeIndex != toggleModeIndex) {
-        debugfln("Returning to previous mode");
-        currentModeIndex = previousModeIndex;
-        changeModeMessage();
-        updateDisplay();
-      } else {
-        debugfln("Toggle mode and previous mode are the same");
-      }
-    } else {
-      debugf("Temporary toggle to '");
-      debug(toggleMode().name);
-      debugfln("'");
-
-      currentModeIndex = toggleModeIndex;
-      updateDisplay();
-    }
+    toggleToggleMode();
   }
 
   if (encoderTurned < 0) {
@@ -441,8 +464,6 @@ void loop() {
 
   if (inToggleMode() && (lastAction < currentMillis - TOGGLE_MODE_EXPIRES_IN)) {
     debugfln("Toggle Mode expired; Returning to previous mode");
-    currentModeIndex = previousModeIndex;
-    changeModeMessage();
-    updateDisplay();
+    returnToPreviousMode();
   }
 }
