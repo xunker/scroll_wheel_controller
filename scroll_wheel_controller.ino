@@ -38,6 +38,17 @@ struct controlAction {
   uint8_t modeMask;
 };
 
+/* Control action with acceleration; intended scroll wheel, when you continually
+   turn the scroll wheel it will start to send the "accelerated" action instead */
+struct controlActionAcceleration {
+  const String name; // name of action
+  KeyboardKeycode stdKeys[MAX_KEYS_PER_ACTION]; // standard keys to send
+  KeyboardKeycode accelkeys[MAX_KEYS_PER_ACTION]; // accelerated keys to send
+  ConsumerKeycode stdConsumerKey; // consumer key to send (just one)
+  ConsumerKeycode accelConsumerKey; // consumer key to send (just one)
+  uint8_t modeMask;
+};
+
 /*
 modeMask - binary bitmask
 0b0000000x - Key down time
@@ -76,6 +87,30 @@ struct controlMode {
   controlAction middle;
 };
 
+/* HID consumer/media key abstraction for OS compatibility */
+
+#define VOLUME_UP_CODE MEDIA_VOLUME_UP
+// #define VOLUME_UP_CODE HID_CONSUMER_VOLUME_INCREMENT
+#define VOLUME_DOWN_CODE MEDIA_VOLUME_DOWN
+// #define VOLUME_DOWN_CODE HID_CONSUMER_VOLUME_DECREMENT
+#define VOLUME_MUTE_CODE MEDIA_VOLUME_MUTE
+// #define VOLUME_MUTE_CODE HID_CONSUMER_MUTE
+
+#define PLAY_PAUSE_CODE MEDIA_PLAY_PAUSE
+// #define PLAY_PAUSE_CODE HID_CONSUMER_PLAY
+
+// #define TRACK_NEXT_CODE MEDIA_NEXT
+// #define TRACK_NEXT_CODE HID_CONSUMER_FAST_FORWARD
+#define TRACK_NEXT_CODE HID_CONSUMER_SCAN_NEXT_TRACK
+// #define TRACK_PREVIOUS_CODE MEDIA_PREVIOUS
+// #define TRACK_PREVIOUS_CODE HID_CONSUMER_REWIND
+#define TRACK_PREVIOUS_CODE HID_CONSUMER_SCAN_PREVIOUS_TRACK
+
+// #define TRACK_SCAN_FORWARD MEDIA_FAST_FORWARD
+#define TRACK_SCAN_FORWARD HID_CONSUMER_SCAN_NEXT_TRACK
+// #define TRACK_SCAN_BACKWARD MEDIA_REWIND
+#define TRACK_SCAN_BACKWARD HID_CONSUMER_SCAN_PREVIOUS_TRACK
+
 #define NUMBER_OF_MODES 6
 /*
 
@@ -90,23 +125,23 @@ controlMode controlModeList[NUMBER_OF_MODES] = {
     {{"Volume"}, {"Volume"},
      {""},
      {""},
-     {"-", NULL, NULL, NULL, MEDIA_VOLUME_DOWN},
-     {"+", NULL, NULL, NULL, MEDIA_VOLUME_UP},
-     {"Mute", NULL, NULL, NULL, MEDIA_VOLUME_MUTE}},
+     {"-", NULL, NULL, NULL, VOLUME_DOWN_CODE},
+     {"+", NULL, NULL, NULL, VOLUME_UP_CODE},
+     {"Mute", NULL, NULL, NULL, VOLUME_MUTE_CODE}},
 
     {{"Media & Volume"}, {"Volume"},
-     {"Prev\nTrack", NULL, NULL, NULL, MEDIA_PREVIOUS},
-     {"Next\nTrack", NULL, NULL, NULL, MEDIA_NEXT},
-     {"-", NULL, NULL, NULL, MEDIA_VOLUME_DOWN},
-     {"+", NULL, NULL, NULL, MEDIA_VOLUME_UP},
-     {"Play/\nPause", NULL, NULL, NULL, MEDIA_PLAY_PAUSE}},
+     {"Prev\nTrack", NULL, NULL, NULL, TRACK_PREVIOUS_CODE},
+     {"Next\nTrack", NULL, NULL, NULL, TRACK_NEXT_CODE},
+     {"-", NULL, NULL, NULL, VOLUME_DOWN_CODE},
+     {"+", NULL, NULL, NULL, VOLUME_UP_CODE},
+     {"Play/\nPause", NULL, NULL, NULL, PLAY_PAUSE_CODE}},
 
     {{"Media"}, {"Seek"},
-     {"Prev\nTrack", NULL, NULL, NULL, MEDIA_PREVIOUS},
-     {"Next\nTrack", NULL, NULL, NULL, MEDIA_NEXT},
-     {"<", NULL, NULL, NULL, MEDIA_REWIND, LONG_KEY_DOWN_TIME},
-     {">", NULL, NULL, NULL, MEDIA_FAST_FORWARD, LONG_KEY_DOWN_TIME},
-     {"Play/\nPause", NULL, NULL, NULL, MEDIA_PLAY_PAUSE}},
+     {"Prev\nTrack", NULL, NULL, NULL, TRACK_PREVIOUS_CODE},
+     {"Next\nTrack", NULL, NULL, NULL, TRACK_NEXT_CODE},
+     {"<", NULL, NULL, NULL, TRACK_SCAN_BACKWARD, LONG_KEY_DOWN_TIME},
+     {">", NULL, NULL, NULL, TRACK_SCAN_FORWARD, LONG_KEY_DOWN_TIME},
+     {"Play/\nPause", NULL, NULL, NULL, PLAY_PAUSE_CODE}},
 
     {{"VLC"}, {"Scrub"},
      {"Prev\nTrack", KEY_LEFT_GUI, KEY_LEFT_ARROW, NULL, NULL},
@@ -282,7 +317,7 @@ void sendAction(controlAction actionToSend)
 
   if (actionToSend.consumerKey) {
     debuglnfmt(actionToSend.consumerKey, HEX);
-    Keyboard.press(actionToSend.consumerKey);
+    Consumer.press(actionToSend.consumerKey);
   }
 
   if (bitRead(actionToSend.modeMask, 7)) {
@@ -315,8 +350,16 @@ void releaseAction(controlAction actionToRelease) {
   debugf("Releasing key action '");
   debug(actionToRelease.name);
   debugfln("'");
+  
+  if (actionToRelease.keys[0]) {
+    Keyboard.releaseAll();
+  }
 
-  Keyboard.releaseAll();
+  if (actionToRelease.consumerKey) {
+    Consumer.releaseAll();
+  }
+
+  
 }
 
 // send action and release the keys immediately after correct delay
