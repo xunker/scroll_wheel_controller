@@ -290,6 +290,7 @@ void setup() {
   updateDisplay();
 
   Keyboard.begin();
+  Consumer.begin();
   Mouse.begin();
 
   encoderSetup();
