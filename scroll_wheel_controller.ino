@@ -158,8 +158,8 @@ controlMode controlModeList[NUMBER_OF_MODES] = {
      {"Middle\nClick", NULL, NULL, NULL, NULL, MOUSE_MIDDLE_CLICK}},
 
     // {{"Navigation"}, {"Arrow"},
-    //  {"Next\nPage", KEY_LEFT_GUI, KEY_LEFT_BRACE, NULL, NULL},  // CONSUMER_BROWSER_BACK maybe
-    //  {"Prev\nPage", KEY_LEFT_GUI, KEY_RIGHT_BRACE, NULL, NULL}, // CONSUMER_BROWSER_FORWARD maybe
+    //  {"Prev\nPage", KEY_LEFT_GUI, KEY_LEFT_BRACE, NULL, NULL},  // CONSUMER_BROWSER_BACK maybe
+    //  {"Next\nPage", KEY_LEFT_GUI, KEY_RIGHT_BRACE, NULL, NULL}, // CONSUMER_BROWSER_FORWARD maybe
     //  {"^", KEY_UP_ARROW, NULL, NULL, NULL},
     //  {"v", KEY_DOWN_ARROW, NULL, NULL, NULL},
     //  {"Enter", KEY_ENTER, NULL, NULL, NULL}},
