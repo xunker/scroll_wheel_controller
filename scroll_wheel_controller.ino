@@ -144,11 +144,11 @@ controlMode controlModeList[NUMBER_OF_MODES] = {
      {"Play/\nPause", NULL, NULL, NULL, PLAY_PAUSE_CODE}},
 
     {{"VLC"}, {"Scrub"},
-     {"Prev\nTrack", KEY_LEFT_GUI, KEY_LEFT_ARROW, NULL, NULL},
-     {"Next\nTrack", KEY_LEFT_GUI, KEY_RIGHT_ARROW, NULL, NULL},
-     {"<", KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_LEFT_ARROW, NULL},
-     {">", KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_RIGHT_ARROW, NULL},
-     {"Play/\nPause", KEY_SPACE, NULL, NULL, NULL}},
+     {"Prev\nTrack", KEY_LEFT_GUI, KEY_LEFT_ARROW},
+     {"Next\nTrack", KEY_LEFT_GUI, KEY_RIGHT_ARROW},
+     {"<", KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_LEFT_ARROW},
+     {">", KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_RIGHT_ARROW},
+     {"Play/\nPause", KEY_SPACE}},
 
     {{"Mouse"}, {"Scroll"},
      {"Left\nClick", NULL, NULL, NULL, NULL, MOUSE_LEFT_CLICK},
@@ -165,11 +165,11 @@ controlMode controlModeList[NUMBER_OF_MODES] = {
     //  {"Enter", KEY_ENTER, NULL, NULL, NULL}},
 
     {{"System"}, {"Brightness"},
-     {"Ext\n-", KEY_SCROLL_LOCK, NULL, NULL, NULL}, // External Display
-     {"Ext\n+", KEY_PAUSE, NULL, NULL, NULL},       // External Display
+     {"Ext\n-", KEY_SCROLL_LOCK}, // External Display
+     {"Ext\n+", KEY_PAUSE},       // External Display
      {"-", NULL, NULL, NULL, CONSUMER_BRIGHTNESS_DOWN}, // Internal Display
      {"+", NULL, NULL, NULL, CONSUMER_BRIGHTNESS_UP},   // Internal Display
-     {"", NULL, NULL, NULL, NULL}},
+     {""}},
 };
 
 #define DEFAULT_MODE 1 // Mode to use upon startup
