@@ -38,17 +38,6 @@ struct controlAction {
   uint8_t modeMask;
 };
 
-/* Control action with acceleration; intended scroll wheel, when you continually
-   turn the scroll wheel it will start to send the "accelerated" action instead */
-struct controlActionAcceleration {
-  const String name; // name of action
-  KeyboardKeycode stdKeys[MAX_KEYS_PER_ACTION]; // standard keys to send
-  KeyboardKeycode accelkeys[MAX_KEYS_PER_ACTION]; // accelerated keys to send
-  ConsumerKeycode stdConsumerKey; // consumer key to send (just one)
-  ConsumerKeycode accelConsumerKey; // consumer key to send (just one)
-  uint8_t modeMask;
-};
-
 /*
 modeMask - binary bitmask
 0b0000000x - Key down time
@@ -136,18 +125,25 @@ controlMode controlModeList[NUMBER_OF_MODES] = {
      {"+", NULL, NULL, NULL, VOLUME_UP_CODE},
      {"Play/\nPause", NULL, NULL, NULL, PLAY_PAUSE_CODE}},
 
-    {{"Media"}, {"Seek"},
-     {"Prev\nTrack", NULL, NULL, NULL, TRACK_PREVIOUS_CODE},
-     {"Next\nTrack", NULL, NULL, NULL, TRACK_NEXT_CODE},
-     {"<", NULL, NULL, NULL, TRACK_SCAN_BACKWARD, LONG_KEY_DOWN_TIME},
-     {">", NULL, NULL, NULL, TRACK_SCAN_FORWARD, LONG_KEY_DOWN_TIME},
-     {"Play/\nPause", NULL, NULL, NULL, PLAY_PAUSE_CODE}},
+    // {{"Media"}, {"Seek"},
+    //  {"Prev\nTrack", NULL, NULL, NULL, TRACK_PREVIOUS_CODE},
+    //  {"Next\nTrack", NULL, NULL, NULL, TRACK_NEXT_CODE},
+    //  {"<", NULL, NULL, NULL, TRACK_SCAN_BACKWARD, LONG_KEY_DOWN_TIME},
+    //  {">", NULL, NULL, NULL, TRACK_SCAN_FORWARD, LONG_KEY_DOWN_TIME},
+    //  {"Play/\nPause", NULL, NULL, NULL, PLAY_PAUSE_CODE}},
 
     {{"VLC"}, {"Scrub"},
      {"Prev\nTrack", KEY_LEFT_GUI, KEY_LEFT_ARROW},
      {"Next\nTrack", KEY_LEFT_GUI, KEY_RIGHT_ARROW},
      {"<", KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_LEFT_ARROW},
      {">", KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_RIGHT_ARROW},
+     {"Play/\nPause", KEY_SPACE}},
+
+    {{"YouTube"}, {"Scrub"},
+     {"Seek\nBack", KEY_J},
+     {"Seek\nForward", KEY_L},
+     {"<", KEY_LEFT_ARROW},
+     {">", KEY_RIGHT_ARROW},
      {"Play/\nPause", KEY_SPACE}},
 
     {{"Mouse"}, {"Scroll"},
@@ -158,11 +154,11 @@ controlMode controlModeList[NUMBER_OF_MODES] = {
      {"Middle\nClick", NULL, NULL, NULL, NULL, MOUSE_MIDDLE_CLICK}},
 
     // {{"Navigation"}, {"Arrow"},
-    //  {"Prev\nPage", KEY_LEFT_GUI, KEY_LEFT_BRACE, NULL, NULL},  // CONSUMER_BROWSER_BACK maybe
-    //  {"Next\nPage", KEY_LEFT_GUI, KEY_RIGHT_BRACE, NULL, NULL}, // CONSUMER_BROWSER_FORWARD maybe
-    //  {"^", KEY_UP_ARROW, NULL, NULL, NULL},
-    //  {"v", KEY_DOWN_ARROW, NULL, NULL, NULL},
-    //  {"Enter", KEY_ENTER, NULL, NULL, NULL}},
+    //  {"Prev\nPage", KEY_LEFT_GUI, KEY_LEFT_BRACE},  // CONSUMER_BROWSER_BACK maybe
+    //  {"Next\nPage", KEY_LEFT_GUI, KEY_RIGHT_BRACE}, // CONSUMER_BROWSER_FORWARD maybe
+    //  {"^", KEY_UP_ARROW},
+    //  {"v", KEY_DOWN_ARROW},
+    //  {"Enter", KEY_ENTER}},
 
     {{"System"}, {"Brightness"},
      {"Ext\n-", KEY_SCROLL_LOCK}, // External Display
@@ -188,9 +184,11 @@ unsigned long lastAction = 0;
 #define TOGGLE_MODE_EXPIRES_IN 10000 // ms
 
 // How long until the screen saver starts?
-#define SCREENSAVER_STARTS_IN 300000 // ms
+// #define SCREENSAVER_STARTS_IN 300000 // ms
+#define SCREENSAVER_STARTS_IN 3000 // ms
 
 bool screensaverEnabled = false;
+const String screensaverText = "scrnsvr";
 
 controlMode currentMode() {
   return controlModeList[currentModeIndex];
@@ -408,8 +406,8 @@ void loop() {
 
     if (screensaverEnabled) {
       oled.clear();
-      oled.setCursor(random(0, oled.displayWidth()-oled.fieldWidth(12)), random(0, displayHeightInRows));
-      oled.print(F("Screen saver"));
+      oled.setCursor(random(0, oled.displayWidth()-oled.fieldWidth(screensaverText.length())), random(0, displayHeightInRows));
+      oled.print(screensaverText);
     }
   }
 
