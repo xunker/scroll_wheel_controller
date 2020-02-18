@@ -30,11 +30,20 @@
 
 #define MOUSE_SCROLL_AMOUNT 5
 
+#define KEYBOARD_HID_TYPE 0
+#define CONSUMER_HID_TYPE 1
+#define MOUSE_HID_TYPE 1
+struct actionKeypress {
+  const uint8_t hidType; // KEYBOARD_HID_TYPE,  CONSUMER_HID_TYPE, MOUSE_HID_TYPE
+  const uint16_t keyCode; // ConsumerKeycode is uint16t, KeyboardKeycode is uint8_t
+};
+
 #define MAX_KEYS_PER_ACTION 3
 struct controlAction {
   const String name; // name of action
-  KeyboardKeycode keys[MAX_KEYS_PER_ACTION]; // standard keys to send
-  ConsumerKeycode consumerKey; // consumer key to send (just one)
+  // KeyboardKeycode keys[MAX_KEYS_PER_ACTION]; // standard keys to send
+  // ConsumerKeycode consumerKey; // consumer key to send (just one)
+  actionKeypress keys[MAX_KEYS_PER_ACTION]; // standard keys to send
   uint8_t modeMask;
 };
 
@@ -130,58 +139,77 @@ controlMode controlModeList[] = {
     {{"Volume"}, {"Volume"},
      {},
      {},
-     {"-", NULL, NULL, NULL, VOLUME_DOWN_CODE},
-     {"+", NULL, NULL, NULL, VOLUME_UP_CODE},
-     {"Mute", NULL, NULL, NULL, VOLUME_MUTE_CODE}},
+     {"-", {CONSUMER_HID_TYPE, VOLUME_DOWN_CODE}},
+     {"+", {CONSUMER_HID_TYPE, VOLUME_UP_CODE}},
+     {"Mute", {CONSUMER_HID_TYPE, VOLUME_MUTE_CODE}}},
 
     {{"Media"}, {"Volume"},
-     {"Prev\nTrack", NULL, NULL, NULL, TRACK_PREVIOUS_CODE},
-     {"Next\nTrack", NULL, NULL, NULL, TRACK_NEXT_CODE},
-     {"-", NULL, NULL, NULL, VOLUME_DOWN_CODE},
-     {"+", NULL, NULL, NULL, VOLUME_UP_CODE},
-     {"Play/\nPause", NULL, NULL, NULL, PLAY_PAUSE_CODE}},
+     {"Prev\nTrack", {CONSUMER_HID_TYPE, TRACK_PREVIOUS_CODE}},
+     {"Next\nTrack", {CONSUMER_HID_TYPE, TRACK_NEXT_CODE}},
+     {"-", {CONSUMER_HID_TYPE, VOLUME_DOWN_CODE}},
+     {"+", {CONSUMER_HID_TYPE, VOLUME_UP_CODE}},
+     {"Play/\nPause", {CONSUMER_HID_TYPE, PLAY_PAUSE_CODE}}},
 
-    // {{"Media"}, {"Seek"},
-    //  {"Prev\nTrack", NULL, NULL, NULL, TRACK_PREVIOUS_CODE},
-    //  {"Next\nTrack", NULL, NULL, NULL, TRACK_NEXT_CODE},
-    //  {"<", NULL, NULL, NULL, TRACK_SCAN_BACKWARD, LONG_KEY_DOWN_TIME},
-    //  {">", NULL, NULL, NULL, TRACK_SCAN_FORWARD, LONG_KEY_DOWN_TIME},
-    //  {"Play/\nPause", NULL, NULL, NULL, PLAY_PAUSE_CODE}},
+    {{"Media"}, {"Seek"},
+     {"Prev\nTrack", {CONSUMER_HID_TYPE, TRACK_PREVIOUS_CODE}},
+     {"Next\nTrack", {CONSUMER_HID_TYPE, TRACK_NEXT_CODE}},
+     {"<", {CONSUMER_HID_TYPE, TRACK_SCAN_BACKWARD}, LONG_KEY_DOWN_TIME},
+     {">", {CONSUMER_HID_TYPE, TRACK_SCAN_FORWARD}, LONG_KEY_DOWN_TIME},
+     {"Play/\nPause", {CONSUMER_HID_TYPE, PLAY_PAUSE_CODE}}},
 
     {{"VLC"}, {"Scrub"},
-     {"Prev\nTrack", KEY_LEFT_GUI, KEY_LEFT_ARROW},
-     {"Next\nTrack", KEY_LEFT_GUI, KEY_RIGHT_ARROW},
-     {"<", KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_LEFT_ARROW},
-     {">", KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_RIGHT_ARROW},
-     {"Play/\nPause", KEY_SPACE}},
+      {"Prev\nTrack",
+        {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_LEFT_ARROW}}
+      },
+      {"Next\nTrack",
+        {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_RIGHT_ARROW}}
+      },
+      {"<",
+        {
+          {KEYBOARD_HID_TYPE, KEY_LEFT_CTRL},
+          {KEYBOARD_HID_TYPE, KEY_LEFT_GUI},
+          {KEYBOARD_HID_TYPE, KEY_LEFT_ARROW}
+        }
+      },
+      {">",
+        {
+          {KEYBOARD_HID_TYPE, KEY_LEFT_CTRL},
+          {KEYBOARD_HID_TYPE, KEY_LEFT_GUI},
+          {KEYBOARD_HID_TYPE, KEY_RIGHT_ARROW}
+        }
+      },
+      {"Play/\nPause",
+        {KEYBOARD_HID_TYPE, KEY_SPACE}
+      }
+    },
 
     {{"YouTube"}, {"Scrub"},
-     {"Seek\nBack", KEY_J},
-     {"Seek\nForward", KEY_L},
-     {"<", KEY_LEFT_ARROW},
-     {">", KEY_RIGHT_ARROW},
-     {"Play/\nPause", KEY_SPACE}},
+     {"Seek\nBack", {KEYBOARD_HID_TYPE, KEY_J}},
+     {"Seek\nForward", {KEYBOARD_HID_TYPE, KEY_L}},
+     {"<", {KEYBOARD_HID_TYPE, KEY_LEFT_ARROW}},
+     {">", {KEYBOARD_HID_TYPE, KEY_RIGHT_ARROW}},
+     {"Play/\nPause", {KEYBOARD_HID_TYPE, KEY_SPACE}}},
 
     {{"Mouse"}, {"Scroll"},
-     {"Left\nClick", NULL, NULL, NULL, NULL, MOUSE_LEFT_CLICK},
-     {"Right\nClick", NULL, NULL, NULL, NULL, MOUSE_RIGHT_CLICK},
-     {"^", NULL, NULL, NULL, NULL, MOUSE_SCROLL_NEGATIVE},
-     {"v", NULL, NULL, NULL, NULL, MOUSE_SCROLL_POSITIVE},
-     {"Middle\nClick", NULL, NULL, NULL, NULL, MOUSE_MIDDLE_CLICK}},
+     {"Left\nClick", {MOUSE_HID_TYPE, MOUSE_LEFT_CLICK}},
+     {"Right\nClick", {MOUSE_HID_TYPE, MOUSE_RIGHT_CLICK}},
+     {"^", {MOUSE_HID_TYPE, MOUSE_SCROLL_NEGATIVE}},
+     {"v", {MOUSE_HID_TYPE, MOUSE_SCROLL_POSITIVE}},
+     {"Middle\nClick", {MOUSE_HID_TYPE, MOUSE_MIDDLE_CLICK}}},
 
-    // {{"Navigation"}, {"Arrow"},
-    //  {"Prev\nPage", KEY_LEFT_GUI, KEY_LEFT_BRACE},  // CONSUMER_BROWSER_BACK maybe
-    //  {"Next\nPage", KEY_LEFT_GUI, KEY_RIGHT_BRACE}, // CONSUMER_BROWSER_FORWARD maybe
-    //  {"^", KEY_UP_ARROW},
-    //  {"v", KEY_DOWN_ARROW},
-    //  {"Enter", KEY_ENTER}},
+    {{"Navigation"}, {"Arrow"},
+     {"Prev\nPage", {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_LEFT_BRACE}}},  // CONSUMER_BROWSER_BACK maybe
+     {"Next\nPage", {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_RIGHT_BRACE}}}, // CONSUMER_BROWSER_FORWARD maybe
+     {"^", {KEYBOARD_HID_TYPE, KEY_UP_ARROW}},
+     {"v", {KEYBOARD_HID_TYPE, KEY_DOWN_ARROW}},
+     {"Enter", {KEYBOARD_HID_TYPE, KEY_ENTER}}},
 
-    // {{"System"}, {"Brightness"},
-    //  {"Ext\n-", KEY_SCROLL_LOCK}, // External Display
-    //  {"Ext\n+", KEY_PAUSE},       // External Display
-    //  {"-", NULL, NULL, NULL, CONSUMER_BRIGHTNESS_DOWN}, // Internal Display
-    //  {"+", NULL, NULL, NULL, CONSUMER_BRIGHTNESS_UP},   // Internal Display
-    //  {""}},
+    {{"System"}, {"Brightness"},
+     {"Ext\n-", {KEYBOARD_HID_TYPE, KEY_SCROLL_LOCK}}, // External Display
+     {"Ext\n+", {KEYBOARD_HID_TYPE, KEY_PAUSE}},       // External Display
+     {"-", {CONSUMER_HID_TYPE, CONSUMER_BRIGHTNESS_DOWN}}, // Internal Display
+     {"+", {CONSUMER_HID_TYPE, CONSUMER_BRIGHTNESS_UP}},   // Internal Display
+     {""}},
 };
 const uint8_t numberOfModes = sizeof (controlModeList) / sizeof (controlModeList[0]);
 
@@ -325,37 +353,37 @@ void sendAction(controlAction actionToSend)
   debugfln("'");
 
   for (uint8_t i = 0; i < MAX_KEYS_PER_ACTION; i++) {
-    if (actionToSend.keys[i]) {
-      debuglnfmt(actionToSend.keys[i], HEX);
-      Keyboard.press(actionToSend.keys[i]);
-    }
-  }
+    if (sizeof(actionToSend.keys[i]) > 0) {
 
-  if (actionToSend.consumerKey) {
-    debuglnfmt(actionToSend.consumerKey, HEX);
-    Consumer.press(actionToSend.consumerKey);
-  }
+      debuglnfmt(actionToSend.keys[i].keyCode, HEX);
+      if (actionToSend.keys[i].hidType == CONSUMER_HID_TYPE) {
+        debugf("CONSUMER_HID_TYPE ");
+        Consumer.press(actionToSend.keys[i].keyCode);
+      } else if (actionToSend.keys[i].hidType == MOUSE_HID_TYPE) {
+        debugf("MOUSE_HID_TYPE ");
+        // if (bitRead(actionToSend.modeMask, 7)) {
+          if (bitRead(actionToSend.modeMask, 6)) {
+            debugfln("scrolling down");
+            Mouse.move(0, 0, MOUSE_SCROLL_AMOUNT);
+          } else if (bitRead(actionToSend.modeMask, 5)) {
+            debugfln("scrolling up");
+            Mouse.move(0, 0, -MOUSE_SCROLL_AMOUNT);
+          } else if (bitRead(actionToSend.modeMask, 4)) {
+            debugfln("left click");
+            Mouse.click(MOUSE_LEFT);
+          } else if (bitRead(actionToSend.modeMask, 3)) {
+            debugfln("right click");
+            Mouse.click(MOUSE_RIGHT);
+          } else if (bitRead(actionToSend.modeMask, 2)) {
+            debugfln("middle click");
+            Mouse.click(MOUSE_MIDDLE);
+          }
+        // }
+      } else {
+        debugf("KEYBOARD_HID_TYPE ");
+        Keyboard.press((KeyboardKeycode)actionToSend.keys[i].keyCode);
+      }
 
-  if (bitRead(actionToSend.modeMask, 7)) {
-    if (bitRead(actionToSend.modeMask, 6)) {
-      debugfln("scrolling down");
-      Mouse.move(0, 0, MOUSE_SCROLL_AMOUNT);
-    }
-    if (bitRead(actionToSend.modeMask, 5)) {
-      debugfln("scrolling up");
-      Mouse.move(0, 0, -MOUSE_SCROLL_AMOUNT);
-    }
-    if (bitRead(actionToSend.modeMask, 4)) {
-      debugfln("left click");
-      Mouse.click(MOUSE_LEFT);
-    }
-    if (bitRead(actionToSend.modeMask, 3)) {
-      debugfln("right click");
-      Mouse.click(MOUSE_RIGHT);
-    }
-    if (bitRead(actionToSend.modeMask, 2)) {
-      debugfln("middle click");
-      Mouse.click(MOUSE_MIDDLE);
     }
   }
 }
@@ -367,13 +395,13 @@ void releaseAction(controlAction actionToRelease) {
   debug(actionToRelease.name);
   debugfln("'");
 
-  if (actionToRelease.keys[0]) {
+  // if (actionToRelease.keys[0]) {
     Keyboard.releaseAll();
-  }
+  // }
 
-  if (actionToRelease.consumerKey) {
+  // if (actionToRelease.consumerKey) {
     Consumer.releaseAll();
-  }
+  // }
 
 
 }
