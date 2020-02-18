@@ -99,8 +99,6 @@ struct controlMode {
 #define TRACK_SCAN_FORWARD HID_CONSUMER_SCAN_NEXT_TRACK
 // #define TRACK_SCAN_BACKWARD MEDIA_REWIND
 #define TRACK_SCAN_BACKWARD HID_CONSUMER_SCAN_PREVIOUS_TRACK
-
-#define NUMBER_OF_MODES 6
 /*
 
 Option to define/switch "control sets", e.g. one set for Macos and one for
@@ -127,15 +125,16 @@ All KEYCODE_* are optional; they will be sent and released simultaneously.
 CONSUMER_KEYCODE is optional; it will be sent and released along with KEYCODE_*.
 modeMask is optional; it controls button behavior and sending of mouse actions.
 */
-controlMode controlModeList[NUMBER_OF_MODES] = {
+
+controlMode controlModeList[] = {
     {{"Volume"}, {"Volume"},
-     {""},
-     {""},
+     {},
+     {},
      {"-", NULL, NULL, NULL, VOLUME_DOWN_CODE},
      {"+", NULL, NULL, NULL, VOLUME_UP_CODE},
      {"Mute", NULL, NULL, NULL, VOLUME_MUTE_CODE}},
 
-    {{"Media & Volume"}, {"Volume"},
+    {{"Media"}, {"Volume"},
      {"Prev\nTrack", NULL, NULL, NULL, TRACK_PREVIOUS_CODE},
      {"Next\nTrack", NULL, NULL, NULL, TRACK_NEXT_CODE},
      {"-", NULL, NULL, NULL, VOLUME_DOWN_CODE},
@@ -177,13 +176,14 @@ controlMode controlModeList[NUMBER_OF_MODES] = {
     //  {"v", KEY_DOWN_ARROW},
     //  {"Enter", KEY_ENTER}},
 
-    {{"System"}, {"Brightness"},
-     {"Ext\n-", KEY_SCROLL_LOCK}, // External Display
-     {"Ext\n+", KEY_PAUSE},       // External Display
-     {"-", NULL, NULL, NULL, CONSUMER_BRIGHTNESS_DOWN}, // Internal Display
-     {"+", NULL, NULL, NULL, CONSUMER_BRIGHTNESS_UP},   // Internal Display
-     {""}},
+    // {{"System"}, {"Brightness"},
+    //  {"Ext\n-", KEY_SCROLL_LOCK}, // External Display
+    //  {"Ext\n+", KEY_PAUSE},       // External Display
+    //  {"-", NULL, NULL, NULL, CONSUMER_BRIGHTNESS_DOWN}, // Internal Display
+    //  {"+", NULL, NULL, NULL, CONSUMER_BRIGHTNESS_UP},   // Internal Display
+    //  {""}},
 };
+const uint8_t numberOfModes = sizeof (controlModeList) / sizeof (controlModeList[0]);
 
 #define DEFAULT_MODE 1 // Mode to use upon startup
 
@@ -479,7 +479,7 @@ void loop() {
     updateLastAction();
 
     currentModeIndex++;
-    if (currentModeIndex >= NUMBER_OF_MODES) {
+    if (currentModeIndex >= numberOfModes) {
       currentModeIndex = 0;
     }
     previousModeIndex = currentModeIndex;
