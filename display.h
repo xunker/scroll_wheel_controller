@@ -52,6 +52,7 @@ const uint8_t *fontList[] = {
 };
 
 uint8_t nFont = sizeof(fontList) / sizeof(uint8_t *);
+#define DEFAULT_FONT 0
 uint8_t currentFont = 0;
 
 void setFont(uint8_t fontNumber) {

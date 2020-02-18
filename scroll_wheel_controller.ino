@@ -76,6 +76,30 @@ struct controlMode {
   controlAction middle;
 };
 
+/* HID consumer/media key abstraction for OS compatibility */
+
+#define VOLUME_UP_CODE MEDIA_VOLUME_UP
+// #define VOLUME_UP_CODE HID_CONSUMER_VOLUME_INCREMENT
+#define VOLUME_DOWN_CODE MEDIA_VOLUME_DOWN
+// #define VOLUME_DOWN_CODE HID_CONSUMER_VOLUME_DECREMENT
+#define VOLUME_MUTE_CODE MEDIA_VOLUME_MUTE
+// #define VOLUME_MUTE_CODE HID_CONSUMER_MUTE
+
+#define PLAY_PAUSE_CODE MEDIA_PLAY_PAUSE
+// #define PLAY_PAUSE_CODE HID_CONSUMER_PLAY
+
+// #define TRACK_NEXT_CODE MEDIA_NEXT
+// #define TRACK_NEXT_CODE HID_CONSUMER_FAST_FORWARD
+#define TRACK_NEXT_CODE HID_CONSUMER_SCAN_NEXT_TRACK
+// #define TRACK_PREVIOUS_CODE MEDIA_PREVIOUS
+// #define TRACK_PREVIOUS_CODE HID_CONSUMER_REWIND
+#define TRACK_PREVIOUS_CODE HID_CONSUMER_SCAN_PREVIOUS_TRACK
+
+// #define TRACK_SCAN_FORWARD MEDIA_FAST_FORWARD
+#define TRACK_SCAN_FORWARD HID_CONSUMER_SCAN_NEXT_TRACK
+// #define TRACK_SCAN_BACKWARD MEDIA_REWIND
+#define TRACK_SCAN_BACKWARD HID_CONSUMER_SCAN_PREVIOUS_TRACK
+
 #define NUMBER_OF_MODES 6
 /*
 
@@ -104,54 +128,61 @@ CONSUMER_KEYCODE is optional; it will be sent and released along with KEYCODE_*.
 modeMask is optional; it controls button behavior and sending of mouse actions.
 */
 controlMode controlModeList[NUMBER_OF_MODES] = {
-  {{"Volume"}, {"Volume"},
-    {""},
-    {""},
-    {"-", NULL, NULL, NULL, MEDIA_VOLUME_DOWN},
-    {"+", NULL, NULL, NULL, MEDIA_VOLUME_UP},
-    {"Mute", NULL, NULL, NULL, MEDIA_VOLUME_MUTE}},
+    {{"Volume"}, {"Volume"},
+     {""},
+     {""},
+     {"-", NULL, NULL, NULL, VOLUME_DOWN_CODE},
+     {"+", NULL, NULL, NULL, VOLUME_UP_CODE},
+     {"Mute", NULL, NULL, NULL, VOLUME_MUTE_CODE}},
 
-  {{"Media & Volume"}, {"Volume"},
-    {"Prev\nTrack", NULL, NULL, NULL, MEDIA_PREVIOUS},
-    {"Next\nTrack", NULL, NULL, NULL, MEDIA_NEXT},
-    {"-", NULL, NULL, NULL, MEDIA_VOLUME_DOWN},
-    {"+", NULL, NULL, NULL, MEDIA_VOLUME_UP},
-    {"Play/\nPause", NULL, NULL, NULL, MEDIA_PLAY_PAUSE}},
+    {{"Media & Volume"}, {"Volume"},
+     {"Prev\nTrack", NULL, NULL, NULL, TRACK_PREVIOUS_CODE},
+     {"Next\nTrack", NULL, NULL, NULL, TRACK_NEXT_CODE},
+     {"-", NULL, NULL, NULL, VOLUME_DOWN_CODE},
+     {"+", NULL, NULL, NULL, VOLUME_UP_CODE},
+     {"Play/\nPause", NULL, NULL, NULL, PLAY_PAUSE_CODE}},
 
-  {{"Media"}, {"Seek"},
-    {"Prev\nTrack", NULL, NULL, NULL, MEDIA_PREVIOUS},
-    {"Next\nTrack", NULL, NULL, NULL, MEDIA_NEXT},
-    {"<", NULL, NULL, NULL, MEDIA_REWIND, LONG_KEY_DOWN_TIME},
-    {">", NULL, NULL, NULL, MEDIA_FAST_FORWARD, LONG_KEY_DOWN_TIME},
-    {"Play/\nPause", NULL, NULL, NULL, MEDIA_PLAY_PAUSE}},
+    // {{"Media"}, {"Seek"},
+    //  {"Prev\nTrack", NULL, NULL, NULL, TRACK_PREVIOUS_CODE},
+    //  {"Next\nTrack", NULL, NULL, NULL, TRACK_NEXT_CODE},
+    //  {"<", NULL, NULL, NULL, TRACK_SCAN_BACKWARD, LONG_KEY_DOWN_TIME},
+    //  {">", NULL, NULL, NULL, TRACK_SCAN_FORWARD, LONG_KEY_DOWN_TIME},
+    //  {"Play/\nPause", NULL, NULL, NULL, PLAY_PAUSE_CODE}},
 
-  {{"VLC"}, {"Scrub"},
-    {"Prev\nTrack", KEY_LEFT_GUI, KEY_LEFT_ARROW, NULL, NULL},
-    {"Next\nTrack", KEY_LEFT_GUI, KEY_RIGHT_ARROW, NULL, NULL},
-    {"<", KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_LEFT_ARROW, NULL},
-    {">", KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_RIGHT_ARROW, NULL},
-    {"Play/\nPause", KEY_SPACE, NULL, NULL, NULL}},
+    {{"VLC"}, {"Scrub"},
+     {"Prev\nTrack", KEY_LEFT_GUI, KEY_LEFT_ARROW},
+     {"Next\nTrack", KEY_LEFT_GUI, KEY_RIGHT_ARROW},
+     {"<", KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_LEFT_ARROW},
+     {">", KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_RIGHT_ARROW},
+     {"Play/\nPause", KEY_SPACE}},
 
-  {{"Mouse"}, {"Scroll"},
-    {"Left\nClick", NULL, NULL, NULL, NULL, MOUSE_LEFT_CLICK},
-    {"Right\nClick", NULL, NULL, NULL, NULL, MOUSE_RIGHT_CLICK},
-    {"^", NULL, NULL, NULL, NULL, MOUSE_SCROLL_NEGATIVE},
-    {"v", NULL, NULL, NULL, NULL, MOUSE_SCROLL_POSITIVE},
-    {"Middle\nClick", NULL, NULL, NULL, NULL, MOUSE_MIDDLE_CLICK}},
+    {{"YouTube"}, {"Scrub"},
+     {"Seek\nBack", KEY_J},
+     {"Seek\nForward", KEY_L},
+     {"<", KEY_LEFT_ARROW},
+     {">", KEY_RIGHT_ARROW},
+     {"Play/\nPause", KEY_SPACE}},
 
-  // {{"Navigation"}, {"Arrow"},
-  //  {"Next\nPage", KEY_LEFT_GUI, KEY_LEFT_BRACE, NULL, NULL},  // CONSUMER_BROWSER_BACK maybe
-  //  {"Prev\nPage", KEY_LEFT_GUI, KEY_RIGHT_BRACE, NULL, NULL}, // CONSUMER_BROWSER_FORWARD maybe
-  //  {"^", KEY_UP_ARROW, NULL, NULL, NULL},
-  //  {"v", KEY_DOWN_ARROW, NULL, NULL, NULL},
-  //  {"Enter", KEY_ENTER, NULL, NULL, NULL}},
+    {{"Mouse"}, {"Scroll"},
+     {"Left\nClick", NULL, NULL, NULL, NULL, MOUSE_LEFT_CLICK},
+     {"Right\nClick", NULL, NULL, NULL, NULL, MOUSE_RIGHT_CLICK},
+     {"^", NULL, NULL, NULL, NULL, MOUSE_SCROLL_NEGATIVE},
+     {"v", NULL, NULL, NULL, NULL, MOUSE_SCROLL_POSITIVE},
+     {"Middle\nClick", NULL, NULL, NULL, NULL, MOUSE_MIDDLE_CLICK}},
 
-  {{"System"}, {"Brightness"},
-    {"Ext\n-", KEY_SCROLL_LOCK}, // External Display
-    {"Ext\n+", KEY_PAUSE},       // External Display
-    {"-", NULL, NULL, NULL, CONSUMER_BRIGHTNESS_DOWN}, // Internal Display
-    {"+", NULL, NULL, NULL, CONSUMER_BRIGHTNESS_UP},   // Internal Display
-    {"", NULL, NULL, NULL, NULL}},
+    // {{"Navigation"}, {"Arrow"},
+    //  {"Prev\nPage", KEY_LEFT_GUI, KEY_LEFT_BRACE},  // CONSUMER_BROWSER_BACK maybe
+    //  {"Next\nPage", KEY_LEFT_GUI, KEY_RIGHT_BRACE}, // CONSUMER_BROWSER_FORWARD maybe
+    //  {"^", KEY_UP_ARROW},
+    //  {"v", KEY_DOWN_ARROW},
+    //  {"Enter", KEY_ENTER}},
+
+    {{"System"}, {"Brightness"},
+     {"Ext\n-", KEY_SCROLL_LOCK}, // External Display
+     {"Ext\n+", KEY_PAUSE},       // External Display
+     {"-", NULL, NULL, NULL, CONSUMER_BRIGHTNESS_DOWN}, // Internal Display
+     {"+", NULL, NULL, NULL, CONSUMER_BRIGHTNESS_UP},   // Internal Display
+     {""}},
 };
 
 #define DEFAULT_MODE 1 // Mode to use upon startup
@@ -170,9 +201,11 @@ unsigned long lastAction = 0;
 #define TOGGLE_MODE_EXPIRES_IN 10000 // ms
 
 // How long until the screen saver starts?
-#define SCREENSAVER_STARTS_IN 300000 // ms
+// #define SCREENSAVER_STARTS_IN 300000 // ms
+#define SCREENSAVER_STARTS_IN 3000 // ms
 
 bool screensaverEnabled = false;
+const String screensaverText = "scrnsvr";
 
 controlMode currentMode() {
   return controlModeList[currentModeIndex];
@@ -272,6 +305,7 @@ void setup() {
   updateDisplay();
 
   Keyboard.begin();
+  Consumer.begin();
   Mouse.begin();
 
   encoderSetup();
@@ -299,7 +333,7 @@ void sendAction(controlAction actionToSend)
 
   if (actionToSend.consumerKey) {
     debuglnfmt(actionToSend.consumerKey, HEX);
-    Keyboard.press(actionToSend.consumerKey);
+    Consumer.press(actionToSend.consumerKey);
   }
 
   if (bitRead(actionToSend.modeMask, 7)) {
@@ -333,7 +367,15 @@ void releaseAction(controlAction actionToRelease) {
   debug(actionToRelease.name);
   debugfln("'");
 
-  Keyboard.releaseAll();
+  if (actionToRelease.keys[0]) {
+    Keyboard.releaseAll();
+  }
+
+  if (actionToRelease.consumerKey) {
+    Consumer.releaseAll();
+  }
+
+
 }
 
 // send action and release the keys immediately after correct delay
@@ -405,8 +447,8 @@ void loop() {
 
     if (screensaverEnabled) {
       oled.clear();
-      oled.setCursor(random(0, oled.displayWidth()-oled.fieldWidth(12)), random(0, displayHeightInRows));
-      oled.print(F("Screen saver"));
+      oled.setCursor(random(0, oled.displayWidth()-oled.fieldWidth(screensaverText.length())), random(0, displayHeightInRows));
+      oled.print(screensaverText);
     }
   }
 
