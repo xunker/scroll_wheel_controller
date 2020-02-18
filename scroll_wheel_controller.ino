@@ -150,12 +150,12 @@ controlMode controlModeList[] = {
      {"+", {CONSUMER_HID_TYPE, VOLUME_UP_CODE}},
      {"Play/\nPause", {CONSUMER_HID_TYPE, PLAY_PAUSE_CODE}}},
 
-    {{"Media"}, {"Seek"},
-     {"Prev\nTrack", {CONSUMER_HID_TYPE, TRACK_PREVIOUS_CODE}},
-     {"Next\nTrack", {CONSUMER_HID_TYPE, TRACK_NEXT_CODE}},
-     {"<", {CONSUMER_HID_TYPE, TRACK_SCAN_BACKWARD}, LONG_KEY_DOWN_TIME},
-     {">", {CONSUMER_HID_TYPE, TRACK_SCAN_FORWARD}, LONG_KEY_DOWN_TIME},
-     {"Play/\nPause", {CONSUMER_HID_TYPE, PLAY_PAUSE_CODE}}},
+    // {{"Media"}, {"Seek"},
+    //  {"Prev\nTrack", {CONSUMER_HID_TYPE, TRACK_PREVIOUS_CODE}},
+    //  {"Next\nTrack", {CONSUMER_HID_TYPE, TRACK_NEXT_CODE}},
+    //  {"<", {CONSUMER_HID_TYPE, TRACK_SCAN_BACKWARD}, LONG_KEY_DOWN_TIME},
+    //  {">", {CONSUMER_HID_TYPE, TRACK_SCAN_FORWARD}, LONG_KEY_DOWN_TIME},
+    //  {"Play/\nPause", {CONSUMER_HID_TYPE, PLAY_PAUSE_CODE}}},
 
     {{"VLC"}, {"Scrub"},
       {"Prev\nTrack",
@@ -190,19 +190,19 @@ controlMode controlModeList[] = {
      {">", {KEYBOARD_HID_TYPE, KEY_RIGHT_ARROW}},
      {"Play/\nPause", {KEYBOARD_HID_TYPE, KEY_SPACE}}},
 
-    {{"Mouse"}, {"Scroll"},
-     {"Left\nClick", {MOUSE_HID_TYPE, MOUSE_LEFT_CLICK}},
-     {"Right\nClick", {MOUSE_HID_TYPE, MOUSE_RIGHT_CLICK}},
-     {"^", {MOUSE_HID_TYPE, MOUSE_SCROLL_NEGATIVE}},
-     {"v", {MOUSE_HID_TYPE, MOUSE_SCROLL_POSITIVE}},
-     {"Middle\nClick", {MOUSE_HID_TYPE, MOUSE_MIDDLE_CLICK}}},
+    // {{"Mouse"}, {"Scroll"},
+    //  {"Left\nClick", {MOUSE_HID_TYPE, MOUSE_LEFT_CLICK}},
+    //  {"Right\nClick", {MOUSE_HID_TYPE, MOUSE_RIGHT_CLICK}},
+    //  {"^", {MOUSE_HID_TYPE, MOUSE_SCROLL_NEGATIVE}},
+    //  {"v", {MOUSE_HID_TYPE, MOUSE_SCROLL_POSITIVE}},
+    //  {"Middle\nClick", {MOUSE_HID_TYPE, MOUSE_MIDDLE_CLICK}}},
 
-    {{"Navigation"}, {"Arrow"},
-     {"Prev\nPage", {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_LEFT_BRACE}}},  // CONSUMER_BROWSER_BACK maybe
-     {"Next\nPage", {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_RIGHT_BRACE}}}, // CONSUMER_BROWSER_FORWARD maybe
-     {"^", {KEYBOARD_HID_TYPE, KEY_UP_ARROW}},
-     {"v", {KEYBOARD_HID_TYPE, KEY_DOWN_ARROW}},
-     {"Enter", {KEYBOARD_HID_TYPE, KEY_ENTER}}},
+    // {{"Navigation"}, {"Arrow"},
+    //  {"Prev\nPage", {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_LEFT_BRACE}}},  // CONSUMER_BROWSER_BACK maybe
+    //  {"Next\nPage", {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_RIGHT_BRACE}}}, // CONSUMER_BROWSER_FORWARD maybe
+    //  {"^", {KEYBOARD_HID_TYPE, KEY_UP_ARROW}},
+    //  {"v", {KEYBOARD_HID_TYPE, KEY_DOWN_ARROW}},
+    //  {"Enter", {KEYBOARD_HID_TYPE, KEY_ENTER}}},
 
     {{"System"}, {"Brightness"},
      {"Ext\n-", {KEYBOARD_HID_TYPE, KEY_SCROLL_LOCK}}, // External Display
@@ -342,6 +342,9 @@ void setup() {
 #define OUTPUT_EVERY 5000
 unsigned long nextOutput = OUTPUT_EVERY;
 
+boolean keyboardPressed = false; // is Keyboard in currently-pressed state?
+boolean consumerPressed = false; // is Consumer in currently-pressed state?
+
 // Send action but don't release the keys
 void sendAction(controlAction actionToSend)
 {
@@ -359,6 +362,7 @@ void sendAction(controlAction actionToSend)
       if (actionToSend.keys[i].hidType == CONSUMER_HID_TYPE) {
         debugf("CONSUMER_HID_TYPE ");
         Consumer.press(actionToSend.keys[i].keyCode);
+        consumerPressed = true;
       } else if (actionToSend.keys[i].hidType == MOUSE_HID_TYPE) {
         debugf("MOUSE_HID_TYPE ");
         // if (bitRead(actionToSend.modeMask, 7)) {
@@ -382,6 +386,7 @@ void sendAction(controlAction actionToSend)
       } else {
         debugf("KEYBOARD_HID_TYPE ");
         Keyboard.press((KeyboardKeycode)actionToSend.keys[i].keyCode);
+        keyboardPressed = true;
       }
 
     }
@@ -395,15 +400,15 @@ void releaseAction(controlAction actionToRelease) {
   debug(actionToRelease.name);
   debugfln("'");
 
-  // if (actionToRelease.keys[0]) {
+  if (keyboardPressed) {
     Keyboard.releaseAll();
-  // }
+    keyboardPressed = false;
+  }
 
-  // if (actionToRelease.consumerKey) {
+  if (consumerPressed) {
     Consumer.releaseAll();
-  // }
-
-
+    consumerPressed = false;
+  }
 }
 
 // send action and release the keys immediately after correct delay
