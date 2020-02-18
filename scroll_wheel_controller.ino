@@ -201,8 +201,8 @@ unsigned long lastAction = 0;
 #define TOGGLE_MODE_EXPIRES_IN 10000 // ms
 
 // How long until the screen saver starts?
-// #define SCREENSAVER_STARTS_IN 300000 // ms
-#define SCREENSAVER_STARTS_IN 3000 // ms
+#define SCREENSAVER_STARTS_IN 300000 // ms
+// #define SCREENSAVER_STARTS_IN 3000 // ms
 
 bool screensaverEnabled = false;
 const String screensaverText = "scrnsvr";
