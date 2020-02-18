@@ -110,29 +110,31 @@ struct controlMode {
 #define TRACK_SCAN_BACKWARD HID_CONSUMER_SCAN_PREVIOUS_TRACK
 /*
 
-Option to define/switch "control sets", e.g. one set for Macos and one for
+Todo:
+* Option to define/switch "control sets", e.g. one set for Macos and one for
 Windows, or for specific apps. Do this by long-pressing the mode select button.
-
-Encoder wheel acceleration. E.g. in VLC mode, use faster scrub keypress the
+* Encoder wheel acceleration. E.g. in VLC mode, use faster scrub keypress the
 longer I continuously rotate the wheel.
 
 Format for controlMode is:
 
 {{"Mode Name"}, {"Scroll Wheel Function Name"},
-    {"Left Arrow Function Name", KEYCODE_1, KEYCODE_2, KEYCODE_3, CONSUMER_KEYCODE, modeMask},
-    {"Right Arrow Function Name", KEYCODE_1, KEYCODE_2, KEYCODE_3, CONSUMER_KEYCODE, modeMask},
-    {"CCW Scroll Wheel Action Name", KEYCODE_1, KEYCODE_2, KEYCODE_3, CONSUMER_KEYCODE, modeMask},
-    {"CW Scroll Wheel Action Name", KEYCODE_1, KEYCODE_2, KEYCODE_3, CONSUMER_KEYCODE, modeMask},
-    {"Centre Button Action Name", KEYCODE_1, KEYCODE_2, KEYCODE_3, CONSUMER_KEYCODE, modeMask}},
+    {"Left Arrow Function Name", {{KEY_TYPE, KEY_CODE}, ..., {KEY_TYPE, KEY_CODE}}, modeMask},
+    {"Right Arrow Function Name", {{KEY_TYPE, KEY_CODE}, ..., {KEY_TYPE, KEY_CODE}}, modeMask},
+    {"CCW Scroll Wheel Action Name", {{KEY_TYPE, KEY_CODE}, ..., {KEY_TYPE, KEY_CODE}}, modeMask},
+    {"CW Scroll Wheel Action Name", {{KEY_TYPE, KEY_CODE}, ..., {KEY_TYPE, KEY_CODE}}, modeMask},
+    {"Centre Button Action Name", {{KEY_TYPE, KEY_CODE}, ..., {KEY_TYPE, KEY_CODE}}, modeMask}},
 
 Mode Name is required.
-Scroll Wheel Function Name optional.
+Scroll Wheel Function Name optional, pass empty string ("") if you don't want it.
 All other action Names are required for that action to work.
 If you want these actions to be ignored, you can leave the Name blank.
 
-All KEYCODE_* are optional; they will be sent and released simultaneously.
-CONSUMER_KEYCODE is optional; it will be sent and released along with KEYCODE_*.
-modeMask is optional; it controls button behavior and sending of mouse actions.
+All keycodes will be sent and released simultaneously.
+modeMask is optional; it controls button behavior for long or short keypresses.
+
+**Note** Due to memory limitations you can only have about 5 active control modes
+before you run out of memory and the display becomes erratic.
 */
 
 controlMode controlModeList[] = {
