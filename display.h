@@ -12,9 +12,12 @@ uint8_t displayHeightInRows;
 uint8_t displayWidthInColumns;
 
 const char *fontName[] = {
-    "Adafruit5x7",
-    // "Iain5x7", // proportional
+    // "Adafruit5x7",
+    // "Iain5x7",         // proportional
     // "Callibri15",      // proportional
+    // "Cooper19",        // proportional
+    // "Corsiva_12",      // proportional
+    // "cp437font8x8",
     // "Arial14",         // proportional
     // "Callibri11_bold", // proportional
     // "TimesNewRoman13", // proportional
@@ -25,19 +28,24 @@ const char *fontName[] = {
     // "newbasic3x5",
     // "Stang5x7",
     // "System5x7",
-    "Wendy3x5",
+    // "utf8font10x16", // proportional
+    // "Verdana12", // proportional
+    // "Wendy3x5",
     // "X11fixed7x14",
     // "X11fixed7x14B",
     // "ZevvPeep8x16"
 };
 
 const uint8_t *fontList[] = {
-    Adafruit5x7,
-    // Iain5x7, // proportional
-    // Callibri15, // proportional
-    // Arial14, // proportional
-    // Callibri11_bold, // proportional
-    // TimesNewRoman13, // proportional
+    // Adafruit5x7,
+    // Iain5x7,          // proportional
+    // Callibri15,       // proportional
+    // Cooper19,         // proportional
+    // Corsiva_12,       // proportional
+    // cp437font8x8,
+    // Arial14,          // proportional
+    // Callibri11_bold,  // proportional
+    // TimesNewRoman13,  // proportional
     // fixed_bold10x15,
     // font5x7,
     font8x8,
@@ -45,7 +53,9 @@ const uint8_t *fontList[] = {
     // newbasic3x5,
     // Stang5x7,
     // System5x7,
-    Wendy3x5,
+    // utf8font10x16, // proportional
+    // Verdana12, // proportional
+    // Wendy3x5,
     // X11fixed7x14,
     // X11fixed7x14B,
     // ZevvPeep8x16
@@ -59,8 +69,8 @@ void setFont(uint8_t fontNumber) {
   oled.setFont(fontList[fontNumber]);
   // displayHeightInRows = (oled.displayHeight() / oled.fontHeight()) - 1;
 
-  // displayWidthInColumns = (oled.displayWidth() / oled.fontWidth()) - 1;
-  displayWidthInColumns = oled.displayWidth();
+  displayWidthInColumns = (oled.displayWidth() / oled.fontWidth()) - 1;
+  // displayWidthInColumns = oled.displayWidth();
   displayHeightInRows = oled.displayRows();
 }
 
@@ -90,7 +100,7 @@ void oledPrintLeftJustify(String msg, uint8_t row)
       oled.setCursor(0, row);
       oled.print(substr);
       substr = "";
-      row++;
+      row += oled.fontRows();
     } else {
       substr = substr + msg[i];
     }
@@ -110,7 +120,7 @@ void oledPrintRightJustify(String msg, uint8_t row) {
       oled.setCursor(col < 0 ? 0 : col, row);
       oled.print(substr);
       substr = "";
-      row++;
+      row += oled.fontRows();
     } else {
       substr = substr + msg[i];
     }
@@ -128,10 +138,11 @@ void oledPrintCentered(String msg, uint8_t row) {
   for (uint8_t i = 0; i < msg.length(); i++) {
     if (msg[i] == '\n') {
       int8_t col = ((oled.displayWidth() - oled.fieldWidth(substr.length())) / 2); // signed!
+
       oled.setCursor(col < 0 ? 0 : col, row);
       oled.print(substr);
       substr = "";
-      row++;
+      row += oled.fontRows();
     } else {
       substr = substr + msg[i];
     }

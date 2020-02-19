@@ -258,31 +258,34 @@ void updateDisplay() {
   // oled.setCursor(0, 1);
   // oled.print("01234567890123456789012345678901234567890");
 
+  uint8_t middleRow = ((displayHeightInRows / oled.fontRows())/3);
+
   // middle button
-  oledPrintCentered(currentMode().middle.name, 2);
+  oledPrintCentered(currentMode().middle.name, middleRow);
 
   // left button
-  oledPrintLeftJustify(currentMode().left.name, 2);
+  oledPrintLeftJustify(currentMode().left.name, middleRow);
 
   // right button
-  oledPrintRightJustify(currentMode().right.name, 2);
+  oledPrintRightJustify(currentMode().right.name, middleRow);
 
   // wheel actions
-  uint8_t wheelActionRow = displayHeightInRows > 7 ? displayHeightInRows - 3 : displayHeightInRows - 2;
+  uint8_t wheelActionRow = (displayHeightInRows - 1) - (oled.fontRows() * 2);
   oledPrintCentered((currentMode().wheelCW.name + F(" ") + currentMode().wheelName + F(" ") + currentMode().wheelCCW.name), wheelActionRow);
 
   // mode quick-toggle
+  uint8_t quickToggleRow = (displayHeightInRows) - oled.fontRows();
   if (previousModeIndex == currentModeIndex) {
     if (currentModeIndex != toggleModeIndex) {
-      oledPrintCentered(toggleMode().name + F(" ->"), displayHeightInRows - 1);
+      oledPrintCentered(toggleMode().name + F(" ->"), quickToggleRow);
     } else {
-      oledPrintCentered(F("--"), displayHeightInRows - 1);
+      oledPrintCentered(F("--"), quickToggleRow);
     }
   } else {
     if (previousModeIndex != toggleModeIndex) {
-      oledPrintCentered("<- " + previousMode().name, displayHeightInRows - 1);
+      oledPrintCentered("<- " + previousMode().name, quickToggleRow);
     } else {
-      oledPrintCentered(toggleMode().name + F(" ->"), displayHeightInRows - 1);
+      oledPrintCentered(toggleMode().name + F(" ->"), quickToggleRow);
     }
   }
 }
