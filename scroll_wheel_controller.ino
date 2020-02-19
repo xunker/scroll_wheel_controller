@@ -146,8 +146,8 @@ controlMode controlModeList[] = {
      {"Mute", {CONSUMER_HID_TYPE, VOLUME_MUTE_CODE}}},
 
     {{"Media"}, {"Volume"},
-     {"Prev\nTrack", {CONSUMER_HID_TYPE, TRACK_PREVIOUS_CODE}},
-     {"Next\nTrack", {CONSUMER_HID_TYPE, TRACK_NEXT_CODE}},
+     {"Prev\n<<", {CONSUMER_HID_TYPE, TRACK_PREVIOUS_CODE}},
+     {"Next\n>>", {CONSUMER_HID_TYPE, TRACK_NEXT_CODE}},
      {"-", {CONSUMER_HID_TYPE, VOLUME_DOWN_CODE}},
      {"+", {CONSUMER_HID_TYPE, VOLUME_UP_CODE}},
      {"Play/\nPause", {CONSUMER_HID_TYPE, PLAY_PAUSE_CODE}}},
@@ -160,10 +160,10 @@ controlMode controlModeList[] = {
     //  {"Play/\nPause", {CONSUMER_HID_TYPE, PLAY_PAUSE_CODE}}},
 
     {{"VLC"}, {"Scrub"},
-      {"Prev\nTrack",
+      {"Prev\n<<",
         {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_LEFT_ARROW}}
       },
-      {"Next\nTrack",
+      {"Next\n>>",
         {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_RIGHT_ARROW}}
       },
       {"<",
@@ -186,8 +186,8 @@ controlMode controlModeList[] = {
     },
 
     {{"YouTube"}, {"Scrub"},
-     {"Seek\nBack", {KEYBOARD_HID_TYPE, KEY_J}},
-     {"Seek\nForward", {KEYBOARD_HID_TYPE, KEY_L}},
+     {"Seek\n<<", {KEYBOARD_HID_TYPE, KEY_J}},
+     {"Seek\n>>", {KEYBOARD_HID_TYPE, KEY_L}},
      {"<", {KEYBOARD_HID_TYPE, KEY_LEFT_ARROW}},
      {">", {KEYBOARD_HID_TYPE, KEY_RIGHT_ARROW}},
      {"Play/\nPause", {KEYBOARD_HID_TYPE, KEY_SPACE}}},
