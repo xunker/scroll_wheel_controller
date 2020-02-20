@@ -1,3 +1,22 @@
+/*
+
+Scroll-wheel USB media controller
+http://github.com/xunker/scroll_wheel_controller
+
+Hardware:
+  * Arduino-compatible MCU with USB-HID capability. Tested with ATmega32u4-based
+    Sparkfun Pro Micro.
+  * 128x64 I2C OLED display
+  * Rotary encoder with momentary centre button
+  * 4 buttons in each cardinal direction (up, down, left, right)
+
+Required libraries:
+  * Arduino HID Project: https://github.com/NicoHood/HID/
+  * SSD1306: https://github.com/greiman/SSD1306Ascii
+  * Rotary: https://github.com/brianlow/Rotary
+
+*/
+
 // Config options for specific microcontrollers
 #include "mcu.h"
 
@@ -152,10 +171,13 @@ void updateDisplay() {
   }
 }
 
+/* Are we currently in quick-toggle mode? */
 bool inToggleMode() {
   return ((previousModeIndex != currentModeIndex) && (previousModeIndex != toggleModeIndex));
 }
 
+/* record the last time an action was performed, and disable the screensaver
+   if it is currently active */
 void updateLastAction() {
   lastAction = millis();
   if (screensaverEnabled) {
