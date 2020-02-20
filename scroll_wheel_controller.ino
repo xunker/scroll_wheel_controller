@@ -25,28 +25,11 @@ Required libraries:
 // https://github.com/NicoHood/HID/blob/d4938ddcff7970bc1d32a040a08afeac4915e4a9/src/HID-APIs/ConsumerAPI.h
 #include "HID-Project.h"
 
-#include "buttons.h"
-
-#include "encoder.h"
-
-#include "display.h"
-
 #include "config.h"
-
-#ifdef ENABLE_DEBUGGING
-  #define debugf(msg) Serial.print(F(msg))
-  #define debug(msg) Serial.print(msg)
-  #define debugfln(msg) Serial.println(F(msg))
-  #define debugln(msg) Serial.println(msg)
-  #define debuglnfmt(msg, fmt) Serial.println(msg, fmt)
-#else
-  #define debugf(msg)
-  #define debug(msg)
-  #define debugfmt(msg, fmt)
-  #define debugln(msg)
-  #define debugfln(msg)
-  #define debuglnfmt(msg, fmt)
-#endif
+#include "buttons.h"
+#include "encoder.h"
+#include "display.h"
+#include "debugging.h"
 
 #define KEYBOARD_HID_TYPE 0
 #define CONSUMER_HID_TYPE 1
@@ -96,7 +79,7 @@ struct controlMode {
 
 const uint8_t numberOfModes = sizeof (controlModeList) / sizeof (controlModeList[0]);
 
-uint8_t currentModeIndex = DEFAULT_MODE;
+uint8_t currentModeIndex = (DEFAULT_MODE > (numberOfModes - 1)) ? 0 : DEFAULT_MODE;
 
 uint8_t previousModeIndex = currentModeIndex;
 
@@ -142,17 +125,22 @@ void updateDisplay() {
   uint8_t middleRow = ((displayHeightInRows / oled.fontRows())/3);
 
   // middle button
-  oledPrintCentered(currentMode().middle.name, middleRow);
+  if (currentMode().middle.name.length() > 0)
+    oledPrintCentered(currentMode().middle.name, middleRow);
 
   // left button
-  oledPrintLeftJustify(currentMode().left.name, middleRow);
+  if (currentMode().left.name.length() > 0)
+    oledPrintLeftJustify(currentMode().left.name, middleRow);
 
   // right button
-  oledPrintRightJustify(currentMode().right.name, middleRow);
+  if (currentMode().right.name.length() > 0)
+    oledPrintRightJustify(currentMode().right.name, middleRow);
 
   // wheel actions
-  uint8_t wheelActionRow = (displayHeightInRows - 1) - (oled.fontRows() * 2);
-  oledPrintCentered((currentMode().wheelCW.name + F(" ") + currentMode().wheelName + F(" ") + currentMode().wheelCCW.name), wheelActionRow);
+  if (currentMode().wheelName.length() > 0) {
+    uint8_t wheelActionRow = (displayHeightInRows - 1) - (oled.fontRows() * 2);
+    oledPrintCentered((currentMode().wheelCW.name + F(" ") + currentMode().wheelName + F(" ") + currentMode().wheelCCW.name), wheelActionRow);
+  }
 
   // mode quick-toggle
   uint8_t quickToggleRow = (displayHeightInRows) - oled.fontRows();
@@ -188,7 +176,7 @@ void updateLastAction() {
 
 void setup() {
   #ifdef ENABLE_DEBUGGING
-    Serial.begin(9600);
+    Serial.begin(DEBUG_BAUD);
   #endif
 
   mcuSetup();
@@ -239,35 +227,38 @@ void sendAction(controlAction actionToSend)
   debugfln("'");
 
   for (uint8_t i = 0; i < MAX_KEYS_PER_ACTION; i++) {
-    if (sizeof(actionToSend.keys[i]) > 0) {
+    if (actionToSend.keys[i].keyCode != NULL) {
 
-      debuglnfmt(actionToSend.keys[i].keyCode, HEX);
+      debugf("HID_TYPE: ");
+      debugfmt(actionToSend.keys[i].keyCode, HEX);
+
       if (actionToSend.keys[i].hidType == CONSUMER_HID_TYPE) {
-        debugf("CONSUMER_HID_TYPE ");
+        debugfln(" CONSUMER_HID_TYPE");
+
         Consumer.press(actionToSend.keys[i].keyCode);
         consumerPressed = true;
       } else if (actionToSend.keys[i].hidType == MOUSE_HID_TYPE) {
-        debugf("MOUSE_HID_TYPE ");
-        // if (bitRead(actionToSend.modeMask, 7)) {
-          if (bitRead(actionToSend.modeMask, 6)) {
-            debugfln("scrolling down");
-            Mouse.move(0, 0, MOUSE_SCROLL_AMOUNT);
-          } else if (bitRead(actionToSend.modeMask, 5)) {
-            debugfln("scrolling up");
-            Mouse.move(0, 0, -MOUSE_SCROLL_AMOUNT);
-          } else if (bitRead(actionToSend.modeMask, 4)) {
-            debugfln("left click");
-            Mouse.click(MOUSE_LEFT);
-          } else if (bitRead(actionToSend.modeMask, 3)) {
-            debugfln("right click");
-            Mouse.click(MOUSE_RIGHT);
-          } else if (bitRead(actionToSend.modeMask, 2)) {
-            debugfln("middle click");
-            Mouse.click(MOUSE_MIDDLE);
-          }
-        // }
+        debugfln(" MOUSE_HID_TYPE");
+
+        if (bitRead(actionToSend.modeMask, 6)) {
+          debugfln("scrolling down");
+          Mouse.move(0, 0, MOUSE_SCROLL_AMOUNT);
+        } else if (bitRead(actionToSend.modeMask, 5)) {
+          debugfln("scrolling up");
+          Mouse.move(0, 0, -MOUSE_SCROLL_AMOUNT);
+        } else if (bitRead(actionToSend.modeMask, 4)) {
+          debugfln("left click");
+          Mouse.click(MOUSE_LEFT);
+        } else if (bitRead(actionToSend.modeMask, 3)) {
+          debugfln("right click");
+          Mouse.click(MOUSE_RIGHT);
+        } else if (bitRead(actionToSend.modeMask, 2)) {
+          debugfln("middle click");
+          Mouse.click(MOUSE_MIDDLE);
+        }
       } else {
-        debugf("KEYBOARD_HID_TYPE ");
+        debugfln(" KEYBOARD_HID_TYPE");
+
         Keyboard.press((KeyboardKeycode)actionToSend.keys[i].keyCode);
         keyboardPressed = true;
       }

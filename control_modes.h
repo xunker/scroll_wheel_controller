@@ -34,7 +34,7 @@ It an be one of:
 before you run out of memory and the display becomes erratic.
 */
 
-controlMode controlModeList[] = {
+const controlMode controlModeList[] = {
     {{"Volume"}, {"Volume"},
      {},
      {},
@@ -108,7 +108,7 @@ controlMode controlModeList[] = {
      {"Ext\n+", {KEYBOARD_HID_TYPE, KEY_PAUSE}},       // External Display
      {"-", {CONSUMER_HID_TYPE, CONSUMER_BRIGHTNESS_DOWN}}, // Internal Display
      {"+", {CONSUMER_HID_TYPE, CONSUMER_BRIGHTNESS_UP}},   // Internal Display
-     {""}},
+     {}},
 };
 
 /* Index of mode to use upon startup, starting from 0 (zero) */

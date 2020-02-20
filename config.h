@@ -4,6 +4,9 @@
 /* Enable Serial debugging */
 // #define ENABLE_DEBUGGING
 
+/* If debugging is enabled, this is the baud rate */
+#define DEBUG_BAUD 57600
+
 /* Define how long the virtual keys should be pressed for either a "regular"
    keypress or a "long" keypress. Milliseconds. */
 #define KEY_DOWN_TIME_REGULAR 10

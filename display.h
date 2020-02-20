@@ -1,6 +1,9 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
+#include "config.h"
+#include "debugging.h"
+
 // Assume 128x64 oled is connected via I2C
 // https://github.com/greiman/SSD1306Ascii
 #include <Wire.h>
@@ -97,6 +100,9 @@ void displaySetup() {
 // Print to oled left-justified with newline support
 void oledPrintLeftJustify(String msg, uint8_t row)
 {
+  debugf("oledPrintLeftJustify: '");
+  debug(msg);
+  debugfln("'");
   String substr = "";
   for (uint8_t i = 0; i < msg.length(); i++) {
     if (msg[i] == '\n') {
@@ -116,6 +122,9 @@ void oledPrintLeftJustify(String msg, uint8_t row)
 
 // Print to oled right-justified with newline support
 void oledPrintRightJustify(String msg, uint8_t row) {
+  debugf("oledPrintRightJustify: '");
+  debug(msg);
+  debugfln("'");
   String substr = "";
   for (uint8_t i = 0; i < msg.length(); i++) {
     if (msg[i] == '\n') {
@@ -137,6 +146,9 @@ void oledPrintRightJustify(String msg, uint8_t row) {
 
 // Print to oled centered with newline support
 void oledPrintCentered(String msg, uint8_t row) {
+  debugf("oledPrintCentered: '");
+  debug(msg);
+  debugfln("'");
   String substr = "";
   for (uint8_t i = 0; i < msg.length(); i++) {
     if (msg[i] == '\n') {
