@@ -12,7 +12,8 @@
 
 #include "display.h"
 
-// #define ENABLE_DEBUGGING
+#include "config.h"
+
 #ifdef ENABLE_DEBUGGING
   #define debugf(msg) Serial.print(F(msg))
   #define debug(msg) Serial.print(msg)
@@ -28,8 +29,6 @@
   #define debuglnfmt(msg, fmt)
 #endif
 
-#define MOUSE_SCROLL_AMOUNT 5
-
 #define KEYBOARD_HID_TYPE 0
 #define CONSUMER_HID_TYPE 1
 #define MOUSE_HID_TYPE 1
@@ -38,7 +37,6 @@ struct actionKeypress {
   const uint16_t keyCode; // ConsumerKeycode is uint16t, KeyboardKeycode is uint8_t
 };
 
-#define MAX_KEYS_PER_ACTION 3
 struct controlAction {
   const String name; // name of action
   // KeyboardKeycode keys[MAX_KEYS_PER_ACTION]; // standard keys to send
@@ -53,13 +51,6 @@ modeMask - binary bitmask
   0: default key down time
   1: long key down time
 
-0b10000000 - action will also send mouse events
-0b11000000 - mouse scroll up
-0b10100000 - mouse scroll down
-0b10010000 - mouse left click
-0b10001000 - mouse right click
-0b10000100 - mouse middle click
-
 combine modeMasks using |
 */
 
@@ -72,9 +63,6 @@ combine modeMasks using |
 #define MOUSE_RIGHT_CLICK MOUSE_EVENT | 0b00001000
 #define MOUSE_MIDDLE_CLICK MOUSE_EVENT | 0b00000100
 
-#define KEY_DOWN_TIME_REGULAR 10 // milliseconds
-#define KEY_DOWN_TIME_LONG 1100  // milliseconds
-
 struct controlMode {
   const String name;
   const String wheelName; // name of scroll wheel action
@@ -85,137 +73,9 @@ struct controlMode {
   controlAction middle;
 };
 
-/* HID consumer/media key abstraction for OS compatibility */
+#include "control_modes.h"
 
-#define VOLUME_UP_CODE MEDIA_VOLUME_UP
-// #define VOLUME_UP_CODE HID_CONSUMER_VOLUME_INCREMENT
-#define VOLUME_DOWN_CODE MEDIA_VOLUME_DOWN
-// #define VOLUME_DOWN_CODE HID_CONSUMER_VOLUME_DECREMENT
-#define VOLUME_MUTE_CODE MEDIA_VOLUME_MUTE
-// #define VOLUME_MUTE_CODE HID_CONSUMER_MUTE
-
-#define PLAY_PAUSE_CODE MEDIA_PLAY_PAUSE
-// #define PLAY_PAUSE_CODE HID_CONSUMER_PLAY
-
-// #define TRACK_NEXT_CODE MEDIA_NEXT
-// #define TRACK_NEXT_CODE HID_CONSUMER_FAST_FORWARD
-#define TRACK_NEXT_CODE HID_CONSUMER_SCAN_NEXT_TRACK
-// #define TRACK_PREVIOUS_CODE MEDIA_PREVIOUS
-// #define TRACK_PREVIOUS_CODE HID_CONSUMER_REWIND
-#define TRACK_PREVIOUS_CODE HID_CONSUMER_SCAN_PREVIOUS_TRACK
-
-// #define TRACK_SCAN_FORWARD MEDIA_FAST_FORWARD
-#define TRACK_SCAN_FORWARD HID_CONSUMER_SCAN_NEXT_TRACK
-// #define TRACK_SCAN_BACKWARD MEDIA_REWIND
-#define TRACK_SCAN_BACKWARD HID_CONSUMER_SCAN_PREVIOUS_TRACK
-/*
-
-Todo:
-* Option to define/switch "control sets", e.g. one set for Macos and one for
-Windows, or for specific apps. Do this by long-pressing the mode select button.
-* Encoder wheel acceleration. E.g. in VLC mode, use faster scrub keypress the
-longer I continuously rotate the wheel.
-
-Format for controlMode is:
-
-{{"Mode Name"}, {"Scroll Wheel Function Name"},
-    {"Left Arrow Function Name", {{KEY_TYPE, KEY_CODE}, ..., {KEY_TYPE, KEY_CODE}}, modeMask},
-    {"Right Arrow Function Name", {{KEY_TYPE, KEY_CODE}, ..., {KEY_TYPE, KEY_CODE}}, modeMask},
-    {"CCW Scroll Wheel Action Name", {{KEY_TYPE, KEY_CODE}, ..., {KEY_TYPE, KEY_CODE}}, modeMask},
-    {"CW Scroll Wheel Action Name", {{KEY_TYPE, KEY_CODE}, ..., {KEY_TYPE, KEY_CODE}}, modeMask},
-    {"Centre Button Action Name", {{KEY_TYPE, KEY_CODE}, ..., {KEY_TYPE, KEY_CODE}}, modeMask}},
-
-Mode Name is required.
-Scroll Wheel Function Name optional, pass empty string ("") if you don't want it.
-All other action Names are required for that action to work.
-If you want these actions to be ignored, you can leave the Name blank.
-
-All keycodes will be sent and released simultaneously.
-modeMask is optional; it controls button behavior for long or short keypresses.
-
-**Note** Due to memory limitations you can only have about 5 active control modes
-before you run out of memory and the display becomes erratic.
-*/
-
-controlMode controlModeList[] = {
-    {{"Volume"}, {"Volume"},
-     {},
-     {},
-     {"-", {CONSUMER_HID_TYPE, VOLUME_DOWN_CODE}},
-     {"+", {CONSUMER_HID_TYPE, VOLUME_UP_CODE}},
-     {"Mute", {CONSUMER_HID_TYPE, VOLUME_MUTE_CODE}}},
-
-    {{"Media"}, {"Volume"},
-     {"Prev\n<<", {CONSUMER_HID_TYPE, TRACK_PREVIOUS_CODE}},
-     {"Next\n>>", {CONSUMER_HID_TYPE, TRACK_NEXT_CODE}},
-     {"-", {CONSUMER_HID_TYPE, VOLUME_DOWN_CODE}},
-     {"+", {CONSUMER_HID_TYPE, VOLUME_UP_CODE}},
-     {"Play/\nPause", {CONSUMER_HID_TYPE, PLAY_PAUSE_CODE}}},
-
-    // {{"Media"}, {"Seek"},
-    //  {"Prev\nTrack", {CONSUMER_HID_TYPE, TRACK_PREVIOUS_CODE}},
-    //  {"Next\nTrack", {CONSUMER_HID_TYPE, TRACK_NEXT_CODE}},
-    //  {"<", {CONSUMER_HID_TYPE, TRACK_SCAN_BACKWARD}, LONG_KEY_DOWN_TIME},
-    //  {">", {CONSUMER_HID_TYPE, TRACK_SCAN_FORWARD}, LONG_KEY_DOWN_TIME},
-    //  {"Play/\nPause", {CONSUMER_HID_TYPE, PLAY_PAUSE_CODE}}},
-
-    {{"VLC"}, {"Scrub"},
-      {"Prev\n<<",
-        {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_LEFT_ARROW}}
-      },
-      {"Next\n>>",
-        {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_RIGHT_ARROW}}
-      },
-      {"<",
-        {
-          {KEYBOARD_HID_TYPE, KEY_LEFT_CTRL},
-          {KEYBOARD_HID_TYPE, KEY_LEFT_GUI},
-          {KEYBOARD_HID_TYPE, KEY_LEFT_ARROW}
-        }
-      },
-      {">",
-        {
-          {KEYBOARD_HID_TYPE, KEY_LEFT_CTRL},
-          {KEYBOARD_HID_TYPE, KEY_LEFT_GUI},
-          {KEYBOARD_HID_TYPE, KEY_RIGHT_ARROW}
-        }
-      },
-      {"Play/\nPause",
-        {KEYBOARD_HID_TYPE, KEY_SPACE}
-      }
-    },
-
-    {{"YouTube"}, {"Scrub"},
-     {"Seek\n<<", {KEYBOARD_HID_TYPE, KEY_J}},
-     {"Seek\n>>", {KEYBOARD_HID_TYPE, KEY_L}},
-     {"<", {KEYBOARD_HID_TYPE, KEY_LEFT_ARROW}},
-     {">", {KEYBOARD_HID_TYPE, KEY_RIGHT_ARROW}},
-     {"Play/\nPause", {KEYBOARD_HID_TYPE, KEY_SPACE}}},
-
-    // {{"Mouse"}, {"Scroll"},
-    //  {"Left\nClick", {MOUSE_HID_TYPE, MOUSE_LEFT_CLICK}},
-    //  {"Right\nClick", {MOUSE_HID_TYPE, MOUSE_RIGHT_CLICK}},
-    //  {"^", {MOUSE_HID_TYPE, MOUSE_SCROLL_NEGATIVE}},
-    //  {"v", {MOUSE_HID_TYPE, MOUSE_SCROLL_POSITIVE}},
-    //  {"Middle\nClick", {MOUSE_HID_TYPE, MOUSE_MIDDLE_CLICK}}},
-
-    // {{"Navigation"}, {"Arrow"},
-    //  {"Prev\nPage", {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_LEFT_BRACE}}},  // CONSUMER_BROWSER_BACK maybe
-    //  {"Next\nPage", {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_RIGHT_BRACE}}}, // CONSUMER_BROWSER_FORWARD maybe
-    //  {"^", {KEYBOARD_HID_TYPE, KEY_UP_ARROW}},
-    //  {"v", {KEYBOARD_HID_TYPE, KEY_DOWN_ARROW}},
-    //  {"Enter", {KEYBOARD_HID_TYPE, KEY_ENTER}}},
-
-    {{"System"}, {"Brightness"},
-     {"Ext\n-", {KEYBOARD_HID_TYPE, KEY_SCROLL_LOCK}}, // External Display
-     {"Ext\n+", {KEYBOARD_HID_TYPE, KEY_PAUSE}},       // External Display
-     {"-", {CONSUMER_HID_TYPE, CONSUMER_BRIGHTNESS_DOWN}}, // Internal Display
-     {"+", {CONSUMER_HID_TYPE, CONSUMER_BRIGHTNESS_UP}},   // Internal Display
-     {""}},
-};
 const uint8_t numberOfModes = sizeof (controlModeList) / sizeof (controlModeList[0]);
-
-#define DEFAULT_MODE 1 // Mode to use upon startup
 
 uint8_t currentModeIndex = DEFAULT_MODE;
 
@@ -227,15 +87,17 @@ uint8_t toggleModeIndex = 0;
 // when did the user last perform an action?
 unsigned long lastAction = 0;
 
-// If in toggle mode and no action performed, return to previous mode in this many milliseconds
-#define TOGGLE_MODE_EXPIRES_IN 10000 // ms
-
-// How long until the screen saver starts?
-#define SCREENSAVER_STARTS_IN 300000 // ms
-// #define SCREENSAVER_STARTS_IN 3000 // ms
-
+// Screensaver state
 bool screensaverEnabled = false;
-const String screensaverText = "scrnsvr";
+const String screensaverText = SCREENSAVER_TEXT;
+
+/* If ENABLE_DEBUGGING is on, this keeps track of the last time the current
+   state was reported on the Serial port. If screensaver mode is enabled, this
+   is also the last time the the screensaver text was moved. Milliseconds */
+unsigned long nextOutput = OUTPUT_EVERY;
+
+boolean keyboardPressed = false; // is Keyboard in currently-pressed state?
+boolean consumerPressed = false; // is Consumer in currently-pressed state?
 
 controlMode currentMode() {
   return controlModeList[currentModeIndex];
@@ -343,12 +205,6 @@ void setup() {
 
   encoderSetup();
 }
-
-#define OUTPUT_EVERY 5000
-unsigned long nextOutput = OUTPUT_EVERY;
-
-boolean keyboardPressed = false; // is Keyboard in currently-pressed state?
-boolean consumerPressed = false; // is Consumer in currently-pressed state?
 
 // Send action but don't release the keys
 void sendAction(controlAction actionToSend)
