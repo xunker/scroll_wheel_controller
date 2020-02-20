@@ -1,3 +1,6 @@
+#ifndef DISPLAY_H
+#define DISPLAY_H
+
 // Assume 128x64 oled is connected via I2C
 // https://github.com/greiman/SSD1306Ascii
 #include <Wire.h>
@@ -153,3 +156,5 @@ void oledPrintCentered(String msg, uint8_t row) {
     oled.print(substr);
   }
 }
+
+#endif

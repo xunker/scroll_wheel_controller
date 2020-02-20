@@ -1,3 +1,6 @@
+#ifndef BUTTONS_H
+#define BUTTONS_H
+
 #include <JC_Button.h> // https://github.com/JChristensen/JC_Button
 
 Button middleButton(MIDDLE_PIN);
@@ -22,3 +25,5 @@ void readButtons() {
   leftButton.read();
   rightButton.read();
 }
+
+#endif

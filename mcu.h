@@ -1,3 +1,6 @@
+#ifndef MCU_H
+#define MCU_H
+
 // #define ARDUINO_MICRO
 #define SPARKFUN_PRO_MICRO // https://learn.sparkfun.com/tutorials/pro-micro--fio-v3-hookup-guide
 
@@ -51,5 +54,7 @@
       // TXLED0;
     }
   }
+
+#endif
 
 #endif

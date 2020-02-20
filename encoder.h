@@ -1,3 +1,6 @@
+#ifndef ENCODER_H
+#define ENCODER_H
+
 // Be sure to enable half-step mode
 #include <Rotary.h>  // https://github.com/brianlow/Rotary
 
@@ -29,3 +32,5 @@ ISR(PCINT0_vect) {
     encoderTurned--;
   }
 }
+
+#endif
