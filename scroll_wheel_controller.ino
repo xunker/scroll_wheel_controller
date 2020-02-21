@@ -154,7 +154,7 @@ void setup() {
   // Will enable the serial port and then just wait forever
   middleButton.read();
   if (middleButton.isPressed()) {
-    Serial.begin(9600);
+    Serial.begin(DEBUG_BAUD);
     oled.clear();
     oled.print(F("Waiting for\nProgrammer\n"));
     uint8_t dotCounter = 0;
