@@ -19,21 +19,21 @@ uint8_t displayWidthInColumns;
 
 const char *fontName[] = {
     // "Adafruit5x7",
-    "Iain5x7",         // proportional
+    // "Arial14",         // proportional
+    // "Callibri11_bold", // proportional
     // "Callibri15",      // proportional
     // "Cooper19",        // proportional
     // "Corsiva_12",      // proportional
     // "cp437font8x8",
-    // "Arial14",         // proportional
-    // "Callibri11_bold", // proportional
-    // "TimesNewRoman13", // proportional
     // "fixed_bold10x15",
     // "font5x7",
     // "font8x8",
+    "Iain5x7",         // proportional
     // "lcd5x7",
     // "newbasic3x5",
     // "Stang5x7",
     // "System5x7",
+    // "TimesNewRoman13", // proportional
     // "utf8font10x16", // proportional
     // "Verdana12", // proportional
     // "Wendy3x5",
@@ -44,21 +44,21 @@ const char *fontName[] = {
 
 const uint8_t *fontList[] = {
     // Adafruit5x7,
-    Iain5x7,          // proportional
+    // Arial14,          // proportional
+    // Callibri11_bold,  // proportional
     // Callibri15,       // proportional
     // Cooper19,         // proportional
     // Corsiva_12,       // proportional
     // cp437font8x8,
-    // Arial14,          // proportional
-    // Callibri11_bold,  // proportional
-    // TimesNewRoman13,  // proportional
     // fixed_bold10x15,
     // font5x7,
     // font8x8,
+    Iain5x7,          // proportional
     // lcd5x7,
     // newbasic3x5,
     // Stang5x7,
     // System5x7,
+    // TimesNewRoman13,  // proportional
     // utf8font10x16, // proportional
     // Verdana12, // proportional
     // Wendy3x5,
@@ -101,8 +101,6 @@ void appendCharToArray(char * charArray, char aChar) {
   /* strcat needs two char arrays, so we build one with the current char
       https://stackoverflow.com/posts/22429675/revisions */
   char cToStr[2] { aChar, '\0' };
-  // cToStr[0] = msg[i];
-  // cToStr[1] = '\0';
   strcat(charArray, cToStr);
 }
 
