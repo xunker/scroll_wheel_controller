@@ -98,11 +98,11 @@ const controlMode controlModeList[] = {
      {"v", {MOUSE_HID_TYPE, MOUSE_SCROLL_POSITIVE}},
      {"Mid\nClick", {MOUSE_HID_TYPE, MOUSE_MIDDLE_CLICK}}},
 
-    {{"Navigation"}, {"Arrow"},
+    {{"Navigation"}, {"Page"},
      {"Prev\nPage", {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_LEFT_BRACE}}},  // CONSUMER_BROWSER_BACK maybe
      {"Next\nPage", {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_RIGHT_BRACE}}}, // CONSUMER_BROWSER_FORWARD maybe
-     {"^", {KEYBOARD_HID_TYPE, KEY_UP_ARROW}},
-     {"v", {KEYBOARD_HID_TYPE, KEY_DOWN_ARROW}},
+     {"^", {KEYBOARD_HID_TYPE, KEY_PAGE_UP}},
+     {"v", {KEYBOARD_HID_TYPE, KEY_PAGE_DOWN}},
      {"Enter", {KEYBOARD_HID_TYPE, KEY_ENTER}}},
 
     {{"System"}, {"Brightness"},
