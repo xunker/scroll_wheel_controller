@@ -97,6 +97,15 @@ void displaySetup() {
   oled.print(F("Display\nInitialized"));
 }
 
+void appendCharToArray(char * charArray, char aChar) {
+  /* strcat needs two char arrays, so we build one with the current char
+      https://stackoverflow.com/posts/22429675/revisions */
+  char cToStr[2] { aChar, '\0' };
+  // cToStr[0] = msg[i];
+  // cToStr[1] = '\0';
+  strcat(charArray, cToStr);
+}
+
 // Print to oled left-justified with newline support
 void oledPrintLeftJustify(char * msg, uint8_t row)
 {
@@ -117,12 +126,7 @@ void oledPrintLeftJustify(char * msg, uint8_t row)
 
       row += oled.fontRows();
     } else {
-      /* strcat needs two char arrays, so we build one with the current char
-         https://stackoverflow.com/posts/22429675/revisions */
-      char cToStr[2] { msg[i], '\0' };
-      // cToStr[0] = msg[i];
-      // cToStr[1] = '\0';
-      strcat(substr, cToStr);
+      appendCharToArray(substr, msg[i]);
     }
   }
   if (strlen(substr) > 0) {
@@ -155,12 +159,7 @@ void oledPrintRightJustify(char * msg, uint8_t row) {
 
       row += oled.fontRows();
     } else {
-      /* strcat needs two char arrays, so we build one with the current char
-         https://stackoverflow.com/posts/22429675/revisions */
-      char cToStr[2] { msg[i], '\0' };
-      // cToStr[0] = msg[i];
-      // cToStr[1] = '\0';
-      strcat(substr, cToStr);
+      appendCharToArray(substr, msg[i]);
     }
   }
   if (strlen(substr) > 0) {
@@ -195,12 +194,7 @@ void oledPrintCentered(char * msg, uint8_t row) {
 
       row += oled.fontRows();
     } else {
-      /* strcat needs two char arrays, so we build one with the current char
-         https://stackoverflow.com/posts/22429675/revisions */
-      char cToStr[2] { msg[i], '\0' };
-      // cToStr[0] = msg[i];
-      // cToStr[1] = '\0';
-      strcat(substr, cToStr);
+      appendCharToArray(substr, msg[i]);
     }
   }
   if (strlen(substr) > 0) {
