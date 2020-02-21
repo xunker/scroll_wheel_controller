@@ -31,4 +31,7 @@
 /* max number of key/mouse actions that can be attached to a single action */
 #define MAX_KEYS_PER_ACTION 3
 
+/* Maximum length of any text label field */
+#define MAX_LABEL_LENGTH 12
+
 #endif

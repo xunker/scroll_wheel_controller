@@ -19,7 +19,7 @@ uint8_t displayWidthInColumns;
 
 const char *fontName[] = {
     // "Adafruit5x7",
-    // "Iain5x7",         // proportional
+    "Iain5x7",         // proportional
     // "Callibri15",      // proportional
     // "Cooper19",        // proportional
     // "Corsiva_12",      // proportional
@@ -28,8 +28,8 @@ const char *fontName[] = {
     // "Callibri11_bold", // proportional
     // "TimesNewRoman13", // proportional
     // "fixed_bold10x15",
-    // "font5x7",
-    "font8x8",
+    "font5x7",
+    // "font8x8",
     // "lcd5x7",
     // "newbasic3x5",
     // "Stang5x7",
@@ -44,7 +44,7 @@ const char *fontName[] = {
 
 const uint8_t *fontList[] = {
     // Adafruit5x7,
-    // Iain5x7,          // proportional
+    Iain5x7,          // proportional
     // Callibri15,       // proportional
     // Cooper19,         // proportional
     // Corsiva_12,       // proportional
@@ -53,8 +53,8 @@ const uint8_t *fontList[] = {
     // Callibri11_bold,  // proportional
     // TimesNewRoman13,  // proportional
     // fixed_bold10x15,
-    // font5x7,
-    font8x8,
+    font5x7,
+    // font8x8,
     // lcd5x7,
     // newbasic3x5,
     // Stang5x7,
@@ -103,20 +103,34 @@ void oledPrintLeftJustify(char * msg, uint8_t row)
   debugf("oledPrintLeftJustify: '");
   debug(msg);
   debugfln("'");
-  String substr = "";
+
+  char substr[MAX_LABEL_LENGTH*2] = "";
   for (uint8_t i = 0; i < strlen(msg); i++) {
     if (msg[i] == '\n') {
       oled.setCursor(0, row);
       oled.print(substr);
-      substr = "";
+
+      debugf(":");
+      debugln(substr);
+
+      strcpy(substr, ""); // empty the temporary string
+      char substr[MAX_LABEL_LENGTH*2] = ""; // empty the temporary string
       row += oled.fontRows();
     } else {
-      substr = substr + msg[i];
+      /* strcat needs two char arrays, so we build one with the current char
+         https://stackoverflow.com/posts/22429675/revisions */
+      char cToStr[2] { msg[i], '\0' };
+      // cToStr[0] = msg[i];
+      // cToStr[1] = '\0';
+      strcat(substr, cToStr);
     }
   }
-  if (substr.length() > 0) {
+  if (strlen(substr) > 0) {
     oled.setCursor(0, row);
     oled.print(substr);
+
+    debugf(":");
+    debugln(substr);
   }
 }
 
@@ -125,22 +139,37 @@ void oledPrintRightJustify(char * msg, uint8_t row) {
   debugf("oledPrintRightJustify: '");
   debug(msg);
   debugfln("'");
-  String substr = "";
+
+  char substr[MAX_LABEL_LENGTH*2] = "";
   for (uint8_t i = 0; i < strlen(msg); i++) {
     if (msg[i] == '\n') {
-      int8_t col = ((oled.displayWidth() - oled.fieldWidth(substr.length()))); // signed!
+      int8_t col = ((oled.displayWidth() - oled.strWidth(substr))); // signed!
+
       oled.setCursor(col < 0 ? 0 : col, row);
       oled.print(substr);
-      substr = "";
+
+      debug(substr);
+      debugfln(":");
+
+      strcpy(substr, ""); // empty the temporary string
+      char substr[MAX_LABEL_LENGTH*2] = ""; // empty the temporary string
       row += oled.fontRows();
     } else {
-      substr = substr + msg[i];
+      /* strcat needs two char arrays, so we build one with the current char
+         https://stackoverflow.com/posts/22429675/revisions */
+      char cToStr[2] { msg[i], '\0' };
+      // cToStr[0] = msg[i];
+      // cToStr[1] = '\0';
+      strcat(substr, cToStr);
     }
   }
-  if (substr.length() > 0) {
-    int8_t col = ((oled.displayWidth() - oled.fieldWidth(substr.length()))); // signed!
+  if (strlen(substr) > 0) {
+    int8_t col = ((oled.displayWidth() - oled.strWidth(substr))); // signed!
     oled.setCursor(col < 0 ? 0 : col, row);
     oled.print(substr);
+
+    debug(substr);
+    debugfln(":");
   }
 }
 
@@ -148,24 +177,40 @@ void oledPrintRightJustify(char * msg, uint8_t row) {
 void oledPrintCentered(char * msg, uint8_t row) {
   debugf("oledPrintCentered: '");
   debug(msg);
-  debugfln(")");
-  String substr = "";
+  debugfln("'");
+
+  char substr[MAX_LABEL_LENGTH*2] = "";
   for (uint8_t i = 0; i < strlen(msg); i++) {
     if (msg[i] == '\n') {
-      int8_t col = ((oled.displayWidth() - oled.fieldWidth(substr.length())) / 2); // signed!
+      int8_t col = ((oled.displayWidth() - oled.strWidth(substr)) / 2); // signed!
 
       oled.setCursor(col < 0 ? 0 : col, row);
       oled.print(substr);
-      substr = "";
+
+      debugf(":");
+      debug(substr);
+      debugfln(":");
+
+      strcpy(substr, ""); // empty the temporary string
+      char substr[MAX_LABEL_LENGTH*2] = ""; // empty the temporary string
       row += oled.fontRows();
     } else {
-      substr = substr + msg[i];
+      /* strcat needs two char arrays, so we build one with the current char
+         https://stackoverflow.com/posts/22429675/revisions */
+      char cToStr[2] { msg[i], '\0' };
+      // cToStr[0] = msg[i];
+      // cToStr[1] = '\0';
+      strcat(substr, cToStr);
     }
   }
-  if (substr.length() > 0) {
-    int8_t col = ((oled.displayWidth() - oled.fieldWidth(substr.length())) / 2); // signed!
+  if (strlen(substr) > 0) {
+    int8_t col = ((oled.displayWidth() - oled.strWidth(substr)) / 2); // signed!
     oled.setCursor(col < 0 ? 0 : col, row);
     oled.print(substr);
+
+    debugf(":");
+    debug(substr);
+    debugfln(":");
   }
 }
 

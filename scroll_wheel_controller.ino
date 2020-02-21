@@ -39,9 +39,6 @@ struct actionKeypress {
   const uint16_t keyCode; // ConsumerKeycode is uint16t, KeyboardKeycode is uint8_t
 };
 
-/* Maximum length of any text label field */
-#define MAX_LABEL_LENGTH 12
-
 struct controlAction {
   const char name[MAX_LABEL_LENGTH]; // name of action
   actionKeypress keys[MAX_KEYS_PER_ACTION]; // standard keys to send
