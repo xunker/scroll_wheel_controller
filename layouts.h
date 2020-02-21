@@ -1,6 +1,8 @@
 #ifndef LAYOUT_H
 #define LAYOUT_H
 
+#include "display.h" // specific config and functions for the display used
+
 /*
 A Layout defines:
   * The font to use

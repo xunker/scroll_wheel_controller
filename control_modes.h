@@ -1,6 +1,8 @@
 #ifndef CONTROL_MODES_H
 #define CONTROL_MODES_H
 
+#include "control_mode_structs.h"
+
 /*
 Format for controlMode is:
 

@@ -1,6 +1,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include "mcu.h" // Config options for specific microcontrollers, such as which pins to use
+
 /* Enable Serial debugging */
 // #define ENABLE_DEBUGGING
 
