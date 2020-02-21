@@ -114,7 +114,7 @@ void oledPrintLeftJustify(char * msg, uint8_t row)
       debugln(substr);
 
       strcpy(substr, ""); // empty the temporary string
-      char substr[MAX_LABEL_LENGTH*2] = ""; // empty the temporary string
+
       row += oled.fontRows();
     } else {
       /* strcat needs two char arrays, so we build one with the current char
@@ -152,7 +152,7 @@ void oledPrintRightJustify(char * msg, uint8_t row) {
       debugfln(":");
 
       strcpy(substr, ""); // empty the temporary string
-      char substr[MAX_LABEL_LENGTH*2] = ""; // empty the temporary string
+
       row += oled.fontRows();
     } else {
       /* strcat needs two char arrays, so we build one with the current char
@@ -192,7 +192,7 @@ void oledPrintCentered(char * msg, uint8_t row) {
       debugfln(":");
 
       strcpy(substr, ""); // empty the temporary string
-      char substr[MAX_LABEL_LENGTH*2] = ""; // empty the temporary string
+
       row += oled.fontRows();
     } else {
       /* strcat needs two char arrays, so we build one with the current char

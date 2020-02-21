@@ -89,7 +89,7 @@ unsigned long lastAction = 0;
 
 // Screensaver state
 bool screensaverEnabled = false;
-const String screensaverText = SCREENSAVER_TEXT;
+const char screensaverText[] = SCREENSAVER_TEXT;
 
 /* If ENABLE_DEBUGGING is on, this keeps track of the last time the current
    state was reported on the Serial port. If screensaver mode is enabled, this
@@ -366,7 +366,7 @@ void loop() {
 
     if (screensaverEnabled) {
       oled.clear();
-      oled.setCursor(random(0, oled.displayWidth()-oled.fieldWidth(screensaverText.length())), random(0, displayHeightInRows));
+      oled.setCursor(random(0, oled.displayWidth()-oled.strWidth(screensaverText)), random(0, displayHeightInRows));
       oled.print(screensaverText);
     }
   }
