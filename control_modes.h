@@ -30,8 +30,10 @@ It an be one of:
   * 0b00000000 - default (short) keypress time (10ms)
   * 0b00000001 - long keypress time (1,100ms)
 
-**Note** Due to memory limitations you can only have about 5 active control modes
+**Note** Due to memory limitations you can only have about 5-7 active control modes
 before you run out of memory and the display becomes erratic.
+
+**REMEMBER**: Any text label cannot be longer than MAX_LABEL_LENGTH (default 12 characters)
 */
 
 const controlMode controlModeList[] = {
@@ -94,7 +96,7 @@ const controlMode controlModeList[] = {
      {"Right\nClick", {MOUSE_HID_TYPE, MOUSE_RIGHT_CLICK}},
      {"^", {MOUSE_HID_TYPE, MOUSE_SCROLL_NEGATIVE}},
      {"v", {MOUSE_HID_TYPE, MOUSE_SCROLL_POSITIVE}},
-     {"Middle\nClick", {MOUSE_HID_TYPE, MOUSE_MIDDLE_CLICK}}},
+     {"Mid\nClick", {MOUSE_HID_TYPE, MOUSE_MIDDLE_CLICK}}},
 
     {{"Navigation"}, {"Arrow"},
      {"Prev\nPage", {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_LEFT_BRACE}}},  // CONSUMER_BROWSER_BACK maybe

@@ -33,7 +33,7 @@ Required libraries:
 
 #define KEYBOARD_HID_TYPE 0
 #define CONSUMER_HID_TYPE 1
-#define MOUSE_HID_TYPE 1
+#define MOUSE_HID_TYPE 2
 struct actionKeypress {
   const uint8_t hidType; // KEYBOARD_HID_TYPE,  CONSUMER_HID_TYPE, MOUSE_HID_TYPE
   const uint16_t keyCode; // ConsumerKeycode is uint16t, KeyboardKeycode is uint8_t
@@ -252,19 +252,19 @@ void sendAction(controlAction actionToSend)
       } else if (actionToSend.keys[i].hidType == MOUSE_HID_TYPE) {
         debugfln(" MOUSE_HID_TYPE");
 
-        if (bitRead(actionToSend.modeMask, 6)) {
+        if (bitRead(actionToSend.keys[i].keyCode, 6)) {
           debugfln("scrolling down");
           Mouse.move(0, 0, MOUSE_SCROLL_AMOUNT);
-        } else if (bitRead(actionToSend.modeMask, 5)) {
+        } else if (bitRead(actionToSend.keys[i].keyCode, 5)) {
           debugfln("scrolling up");
           Mouse.move(0, 0, -MOUSE_SCROLL_AMOUNT);
-        } else if (bitRead(actionToSend.modeMask, 4)) {
+        } else if (bitRead(actionToSend.keys[i].keyCode, 4)) {
           debugfln("left click");
           Mouse.click(MOUSE_LEFT);
-        } else if (bitRead(actionToSend.modeMask, 3)) {
+        } else if (bitRead(actionToSend.keys[i].keyCode, 3)) {
           debugfln("right click");
           Mouse.click(MOUSE_RIGHT);
-        } else if (bitRead(actionToSend.modeMask, 2)) {
+        } else if (bitRead(actionToSend.keys[i].keyCode, 2)) {
           debugfln("middle click");
           Mouse.click(MOUSE_MIDDLE);
         }

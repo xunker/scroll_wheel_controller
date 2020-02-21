@@ -28,7 +28,7 @@ const char *fontName[] = {
     // "Callibri11_bold", // proportional
     // "TimesNewRoman13", // proportional
     // "fixed_bold10x15",
-    "font5x7",
+    // "font5x7",
     // "font8x8",
     // "lcd5x7",
     // "newbasic3x5",
@@ -53,7 +53,7 @@ const uint8_t *fontList[] = {
     // Callibri11_bold,  // proportional
     // TimesNewRoman13,  // proportional
     // fixed_bold10x15,
-    font5x7,
+    // font5x7,
     // font8x8,
     // lcd5x7,
     // newbasic3x5,
