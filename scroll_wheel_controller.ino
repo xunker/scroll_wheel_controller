@@ -30,6 +30,7 @@ Required libraries:
 #include "encoder.h"
 #include "display.h"
 #include "debugging.h"
+#include "layouts.h"
 
 #define KEYBOARD_HID_TYPE 0
 #define CONSUMER_HID_TYPE 1
@@ -120,24 +121,20 @@ void updateDisplay() {
   // oled.setCursor(0, 1);
   // oled.print("01234567890123456789012345678901234567890");
 
-  uint8_t middleRow = ((displayHeightInRows / oled.fontRows())/3);
-
   // middle button
   if (strlen(currentMode().middle.name) > 0)
-    oledPrintCentered(currentMode().middle.name, middleRow);
+    oledPrintCentered(currentMode().middle.name, currentLayout().middleButtonLabelRow);
 
   // left button
   if (strlen(currentMode().left.name) > 0)
-    oledPrintLeftJustify(currentMode().left.name, middleRow);
+    oledPrintLeftJustify(currentMode().left.name, currentLayout().leftRightButtonLabelRow);
 
   // right button
   if (strlen(currentMode().right.name) > 0)
-    oledPrintRightJustify(currentMode().right.name, middleRow);
+    oledPrintRightJustify(currentMode().right.name, currentLayout().leftRightButtonLabelRow);
 
   // wheel actions
   if (strlen(currentMode().wheelName) > 0) {
-    uint8_t wheelActionRow = (displayHeightInRows - 1) - (oled.fontRows() * 2);
-
     const char label[MAX_LABEL_LENGTH*2];
     strcpy(label, currentMode().wheelCW.name);
     strcat(label, " ");
@@ -145,11 +142,10 @@ void updateDisplay() {
     strcat(label, " ");
     strcat(label, currentMode().wheelCCW.name);
 
-    oledPrintCentered(label, wheelActionRow);
+    oledPrintCentered(label, currentLayout().wheelActionLabelRow);
   }
 
   // mode quick-toggle
-  uint8_t quickToggleRow = (displayHeightInRows) - oled.fontRows();
   const char quickToggleLabel[MAX_LABEL_LENGTH*2];
   if (previousModeIndex == currentModeIndex) {
     if (currentModeIndex != toggleModeIndex) {
@@ -168,7 +164,8 @@ void updateDisplay() {
       strcat(quickToggleLabel, " ->");
     }
   }
-  oledPrintCentered(quickToggleLabel, quickToggleRow);
+  if (currentLayout().quickToggleLabelRow <= displayHeightInRows-1)
+    oledPrintCentered(quickToggleLabel, currentLayout().quickToggleLabelRow);
 }
 
 /* Are we currently in quick-toggle mode? */
@@ -194,6 +191,8 @@ void setup() {
   mcuSetup();
 
   displaySetup();
+
+  layoutSetup();
 
   buttonsSetup();
 
@@ -372,15 +371,14 @@ void loop() {
   }
 
   if (upButton.isPressed() && middleButton.wasPressed()) {
-    if (currentFont++ >= nFont-1)
-      currentFont = 0;
+    nextLayout();
 
-    setFont(currentFont);
     oled.clear();
     oled.print(F("Font: "));
-    oled.print(fontName[currentFont]);
+    oled.print(currentLayout().fontName);
     delay(1000);
     updateDisplay();
+
   } else if (leftButton.wasPressed()) {
     sendAction(currentMode().left);
   } else if (leftButton.wasReleased()) {

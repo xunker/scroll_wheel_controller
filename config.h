@@ -2,7 +2,7 @@
 #define CONFIG_H
 
 /* Enable Serial debugging */
-#define ENABLE_DEBUGGING
+// #define ENABLE_DEBUGGING
 
 /* If debugging is enabled, this is the baud rate */
 #define DEBUG_BAUD 57600

@@ -17,69 +17,6 @@ SSD1306AsciiWire oled;
 uint8_t displayHeightInRows;
 uint8_t displayWidthInColumns;
 
-const char *fontName[] = {
-    // "Adafruit5x7",
-    // "Arial14",         // proportional
-    // "Callibri11_bold", // proportional
-    // "Callibri15",      // proportional
-    // "Cooper19",        // proportional
-    // "Corsiva_12",      // proportional
-    // "cp437font8x8",
-    // "fixed_bold10x15",
-    // "font5x7",
-    // "font8x8",
-    "Iain5x7",         // proportional
-    // "lcd5x7",
-    // "newbasic3x5",
-    // "Stang5x7",
-    // "System5x7",
-    // "TimesNewRoman13", // proportional
-    // "utf8font10x16", // proportional
-    // "Verdana12", // proportional
-    // "Wendy3x5",
-    // "X11fixed7x14",
-    // "X11fixed7x14B",
-    // "ZevvPeep8x16"
-};
-
-const uint8_t *fontList[] = {
-    // Adafruit5x7,
-    // Arial14,          // proportional
-    // Callibri11_bold,  // proportional
-    // Callibri15,       // proportional
-    // Cooper19,         // proportional
-    // Corsiva_12,       // proportional
-    // cp437font8x8,
-    // fixed_bold10x15,
-    // font5x7,
-    // font8x8,
-    Iain5x7,          // proportional
-    // lcd5x7,
-    // newbasic3x5,
-    // Stang5x7,
-    // System5x7,
-    // TimesNewRoman13,  // proportional
-    // utf8font10x16, // proportional
-    // Verdana12, // proportional
-    // Wendy3x5,
-    // X11fixed7x14,
-    // X11fixed7x14B,
-    // ZevvPeep8x16
-};
-
-uint8_t nFont = sizeof(fontList) / sizeof(uint8_t *);
-#define DEFAULT_FONT 0
-uint8_t currentFont = 0;
-
-void setFont(uint8_t fontNumber) {
-  oled.setFont(fontList[fontNumber]);
-  // displayHeightInRows = (oled.displayHeight() / oled.fontHeight()) - 1;
-
-  displayWidthInColumns = (oled.displayWidth() / oled.fontWidth()) - 1;
-  // displayWidthInColumns = oled.displayWidth();
-  displayHeightInRows = oled.displayRows();
-}
-
 // to be called from inside main setup()
 void displaySetup() {
   Wire.begin();
@@ -90,8 +27,6 @@ void displaySetup() {
   #else  // RST_PIN >= 0
     oled.begin(&Adafruit128x64, I2C_ADDRESS);
   #endif // RST_PIN >= 0
-
-  setFont(currentFont);
 
   oled.clear();
   oled.print(F("Display\nInitialized"));
