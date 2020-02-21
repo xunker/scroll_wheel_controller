@@ -89,19 +89,19 @@ const controlMode controlModeList[] = {
      {">", {KEYBOARD_HID_TYPE, KEY_RIGHT_ARROW}},
      {"Play/\nPause", {KEYBOARD_HID_TYPE, KEY_SPACE}}},
 
-    // {{"Mouse"}, {"Scroll"},
-    //  {"Left\nClick", {MOUSE_HID_TYPE, MOUSE_LEFT_CLICK}},
-    //  {"Right\nClick", {MOUSE_HID_TYPE, MOUSE_RIGHT_CLICK}},
-    //  {"^", {MOUSE_HID_TYPE, MOUSE_SCROLL_NEGATIVE}},
-    //  {"v", {MOUSE_HID_TYPE, MOUSE_SCROLL_POSITIVE}},
-    //  {"Middle\nClick", {MOUSE_HID_TYPE, MOUSE_MIDDLE_CLICK}}},
+    {{"Mouse"}, {"Scroll"},
+     {"Left\nClick", {MOUSE_HID_TYPE, MOUSE_LEFT_CLICK}},
+     {"Right\nClick", {MOUSE_HID_TYPE, MOUSE_RIGHT_CLICK}},
+     {"^", {MOUSE_HID_TYPE, MOUSE_SCROLL_NEGATIVE}},
+     {"v", {MOUSE_HID_TYPE, MOUSE_SCROLL_POSITIVE}},
+     {"Middle\nClick", {MOUSE_HID_TYPE, MOUSE_MIDDLE_CLICK}}},
 
-    // {{"Navigation"}, {"Arrow"},
-    //  {"Prev\nPage", {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_LEFT_BRACE}}},  // CONSUMER_BROWSER_BACK maybe
-    //  {"Next\nPage", {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_RIGHT_BRACE}}}, // CONSUMER_BROWSER_FORWARD maybe
-    //  {"^", {KEYBOARD_HID_TYPE, KEY_UP_ARROW}},
-    //  {"v", {KEYBOARD_HID_TYPE, KEY_DOWN_ARROW}},
-    //  {"Enter", {KEYBOARD_HID_TYPE, KEY_ENTER}}},
+    {{"Navigation"}, {"Arrow"},
+     {"Prev\nPage", {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_LEFT_BRACE}}},  // CONSUMER_BROWSER_BACK maybe
+     {"Next\nPage", {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_RIGHT_BRACE}}}, // CONSUMER_BROWSER_FORWARD maybe
+     {"^", {KEYBOARD_HID_TYPE, KEY_UP_ARROW}},
+     {"v", {KEYBOARD_HID_TYPE, KEY_DOWN_ARROW}},
+     {"Enter", {KEYBOARD_HID_TYPE, KEY_ENTER}}},
 
     {{"System"}, {"Brightness"},
      {"Ext\n-", {KEYBOARD_HID_TYPE, KEY_SCROLL_LOCK}}, // External Display

@@ -98,13 +98,13 @@ void displaySetup() {
 }
 
 // Print to oled left-justified with newline support
-void oledPrintLeftJustify(String msg, uint8_t row)
+void oledPrintLeftJustify(char * msg, uint8_t row)
 {
   debugf("oledPrintLeftJustify: '");
   debug(msg);
   debugfln("'");
   String substr = "";
-  for (uint8_t i = 0; i < msg.length(); i++) {
+  for (uint8_t i = 0; i < strlen(msg); i++) {
     if (msg[i] == '\n') {
       oled.setCursor(0, row);
       oled.print(substr);
@@ -121,12 +121,12 @@ void oledPrintLeftJustify(String msg, uint8_t row)
 }
 
 // Print to oled right-justified with newline support
-void oledPrintRightJustify(String msg, uint8_t row) {
+void oledPrintRightJustify(char * msg, uint8_t row) {
   debugf("oledPrintRightJustify: '");
   debug(msg);
   debugfln("'");
   String substr = "";
-  for (uint8_t i = 0; i < msg.length(); i++) {
+  for (uint8_t i = 0; i < strlen(msg); i++) {
     if (msg[i] == '\n') {
       int8_t col = ((oled.displayWidth() - oled.fieldWidth(substr.length()))); // signed!
       oled.setCursor(col < 0 ? 0 : col, row);
@@ -145,12 +145,12 @@ void oledPrintRightJustify(String msg, uint8_t row) {
 }
 
 // Print to oled centered with newline support
-void oledPrintCentered(String msg, uint8_t row) {
+void oledPrintCentered(char * msg, uint8_t row) {
   debugf("oledPrintCentered: '");
   debug(msg);
-  debugfln("'");
+  debugfln(")");
   String substr = "";
-  for (uint8_t i = 0; i < msg.length(); i++) {
+  for (uint8_t i = 0; i < strlen(msg); i++) {
     if (msg[i] == '\n') {
       int8_t col = ((oled.displayWidth() - oled.fieldWidth(substr.length())) / 2); // signed!
 

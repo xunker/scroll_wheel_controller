@@ -39,10 +39,11 @@ struct actionKeypress {
   const uint16_t keyCode; // ConsumerKeycode is uint16t, KeyboardKeycode is uint8_t
 };
 
+/* Maximum length of any text label field */
+#define MAX_LABEL_LENGTH 12
+
 struct controlAction {
-  const String name; // name of action
-  // KeyboardKeycode keys[MAX_KEYS_PER_ACTION]; // standard keys to send
-  // ConsumerKeycode consumerKey; // consumer key to send (just one)
+  const char name[MAX_LABEL_LENGTH]; // name of action
   actionKeypress keys[MAX_KEYS_PER_ACTION]; // standard keys to send
   uint8_t modeMask;
 };
@@ -66,8 +67,8 @@ combine modeMasks using |
 #define MOUSE_MIDDLE_CLICK MOUSE_EVENT | 0b00000100
 
 struct controlMode {
-  const String name;
-  const String wheelName; // name of scroll wheel action
+  const char name[MAX_LABEL_LENGTH];
+  const char wheelName[MAX_LABEL_LENGTH]; // name of scroll wheel action
   controlAction left;
   controlAction right;
   controlAction wheelCW;
@@ -117,7 +118,7 @@ controlMode previousMode() {
 void updateDisplay() {
   oled.clear();
 
-  oledPrintCentered(currentMode().name + F(" Mode"), 0);
+  oledPrintCentered(currentMode().name, 0);
 
   // oled.setCursor(0, 1);
   // oled.print("01234567890123456789012345678901234567890");
@@ -125,38 +126,52 @@ void updateDisplay() {
   uint8_t middleRow = ((displayHeightInRows / oled.fontRows())/3);
 
   // middle button
-  if (currentMode().middle.name.length() > 0)
+  if (strlen(currentMode().middle.name) > 0)
     oledPrintCentered(currentMode().middle.name, middleRow);
 
   // left button
-  if (currentMode().left.name.length() > 0)
+  if (strlen(currentMode().left.name) > 0)
     oledPrintLeftJustify(currentMode().left.name, middleRow);
 
   // right button
-  if (currentMode().right.name.length() > 0)
+  if (strlen(currentMode().right.name) > 0)
     oledPrintRightJustify(currentMode().right.name, middleRow);
 
   // wheel actions
-  if (currentMode().wheelName.length() > 0) {
+  if (strlen(currentMode().wheelName) > 0) {
     uint8_t wheelActionRow = (displayHeightInRows - 1) - (oled.fontRows() * 2);
-    oledPrintCentered((currentMode().wheelCW.name + F(" ") + currentMode().wheelName + F(" ") + currentMode().wheelCCW.name), wheelActionRow);
+
+    const char label[MAX_LABEL_LENGTH*2];
+    strcpy(label, currentMode().wheelCW.name);
+    strcat(label, " ");
+    strcat(label, currentMode().wheelName);
+    strcat(label, " ");
+    strcat(label, currentMode().wheelCCW.name);
+
+    oledPrintCentered(label, wheelActionRow);
   }
 
   // mode quick-toggle
   uint8_t quickToggleRow = (displayHeightInRows) - oled.fontRows();
+  const char quickToggleLabel[MAX_LABEL_LENGTH*2];
   if (previousModeIndex == currentModeIndex) {
     if (currentModeIndex != toggleModeIndex) {
-      oledPrintCentered(toggleMode().name + F(" ->"), quickToggleRow);
+      strcpy(quickToggleLabel, toggleMode().name);
+      strcat(quickToggleLabel, " ->");
+
     } else {
-      oledPrintCentered(F("--"), quickToggleRow);
+      strcpy(quickToggleLabel, "--");
     }
   } else {
     if (previousModeIndex != toggleModeIndex) {
-      oledPrintCentered("<- " + previousMode().name, quickToggleRow);
+      strcpy(quickToggleLabel, "<- ");
+      strcat(quickToggleLabel, previousMode().name);
     } else {
-      oledPrintCentered(toggleMode().name + F(" ->"), quickToggleRow);
+      strcpy(quickToggleLabel, toggleMode().name);
+      strcat(quickToggleLabel, " ->");
     }
   }
+  oledPrintCentered(quickToggleLabel, quickToggleRow);
 }
 
 /* Are we currently in quick-toggle mode? */
