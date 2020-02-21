@@ -30,7 +30,7 @@ All keycodes will be sent and released simultaneously.
 modeMask is optional; it controls button behavior for long or short keypresses.
 It an be one of:
   * 0b00000000 - default (short) keypress time (10ms)
-  * 0b00000001 - long keypress time (1,100ms)
+  * 0b00000001 - long keypress time (700ms)
 
 **Note** Due to memory limitations you can only have about 5-7 active control modes
 before you run out of memory and the display becomes erratic.
@@ -53,12 +53,12 @@ const controlMode controlModeList[] = {
      {"+", {CONSUMER_HID_TYPE, MEDIA_VOLUME_UP}},
      {"Play/\nPause", {CONSUMER_HID_TYPE, MEDIA_PLAY_PAUSE}}},
 
-    // {{"Media"}, {"Seek"},
-    //  {"Prev\nTrack", {CONSUMER_HID_TYPE, HID_CONSUMER_SCAN_PREVIOUS_TRACK}},
-    //  {"Next\nTrack", {CONSUMER_HID_TYPE, HID_CONSUMER_SCAN_NEXT_TRACK}},
-    //  {"<", {CONSUMER_HID_TYPE, HID_CONSUMER_SCAN_PREVIOUS_TRACK}, LONG_KEY_DOWN_TIME},
-    //  {">", {CONSUMER_HID_TYPE, HID_CONSUMER_SCAN_NEXT_TRACK}, LONG_KEY_DOWN_TIME},
-    //  {"Play/\nPause", {CONSUMER_HID_TYPE, MEDIA_PLAY_PAUSE}}},
+    {{"Media"}, {"Seek"},
+     {"Prev\nTrack", {CONSUMER_HID_TYPE, HID_CONSUMER_SCAN_PREVIOUS_TRACK}},
+     {"Next\nTrack", {CONSUMER_HID_TYPE, HID_CONSUMER_SCAN_NEXT_TRACK}},
+     {"<", {CONSUMER_HID_TYPE, HID_CONSUMER_SCAN_PREVIOUS_TRACK}, LONG_KEY_DOWN_TIME},
+     {">", {CONSUMER_HID_TYPE, HID_CONSUMER_SCAN_NEXT_TRACK}, LONG_KEY_DOWN_TIME},
+     {"Play/\nPause", {CONSUMER_HID_TYPE, MEDIA_PLAY_PAUSE}}},
 
     {{"VLC"}, {"Scrub"},
       {"Prev\n<<",

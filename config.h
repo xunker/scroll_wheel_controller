@@ -12,7 +12,7 @@
 /* Define how long the virtual keys should be pressed for either a "regular"
    keypress or a "long" keypress. Milliseconds. */
 #define KEY_DOWN_TIME_REGULAR 10
-#define KEY_DOWN_TIME_LONG 1100
+#define KEY_DOWN_TIME_LONG 700
 
 /* If in toggle mode and no action performed, return to previous mode in this
    many milliseconds */
