@@ -75,12 +75,18 @@ const controlMode controlModeList[] = {
           {KEYBOARD_HID_TYPE, KEY_LEFT_CTRL},
           {KEYBOARD_HID_TYPE, KEY_LEFT_GUI},
           {KEYBOARD_HID_TYPE, KEY_LEFT_ARROW}
+        },
+        {
+          {KEYBOARD_HID_TYPE, KEY_LEFT_ARROW}
         }
       },
       {">",
         {
           {KEYBOARD_HID_TYPE, KEY_LEFT_CTRL},
           {KEYBOARD_HID_TYPE, KEY_LEFT_GUI},
+          {KEYBOARD_HID_TYPE, KEY_RIGHT_ARROW}
+        },
+        {
           {KEYBOARD_HID_TYPE, KEY_RIGHT_ARROW}
         }
       }
@@ -93,30 +99,30 @@ const controlMode controlModeList[] = {
      {"<", {KEYBOARD_HID_TYPE, KEY_LEFT_ARROW}},
      {">", {KEYBOARD_HID_TYPE, KEY_RIGHT_ARROW}}},
 
-    {{"Mouse"}, {"Scroll"},
-     {"Left\nClick", {MOUSE_HID_TYPE, MOUSE_LEFT_CLICK}},
-     {"Right\nClick", {MOUSE_HID_TYPE, MOUSE_RIGHT_CLICK}},
-     {"Mid\nClick", {MOUSE_HID_TYPE, MOUSE_MIDDLE_CLICK}},
-     {"^", {MOUSE_HID_TYPE, MOUSE_SCROLL_NEGATIVE}},
-     {"v", {MOUSE_HID_TYPE, MOUSE_SCROLL_POSITIVE}}},
+    // {{"Mouse"}, {"Scroll"},
+    //  {"Left\nClick", {MOUSE_HID_TYPE, MOUSE_LEFT_CLICK}},
+    //  {"Right\nClick", {MOUSE_HID_TYPE, MOUSE_RIGHT_CLICK}},
+    //  {"Mid\nClick", {MOUSE_HID_TYPE, MOUSE_MIDDLE_CLICK}},
+    //  {"^", {MOUSE_HID_TYPE, MOUSE_SCROLL_NEGATIVE}},
+    //  {"v", {MOUSE_HID_TYPE, MOUSE_SCROLL_POSITIVE}}},
 
-    {{"Navigation"}, {"Page"},
-     {"Prev\nPage", {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_LEFT_BRACE}}},  // CONSUMER_BROWSER_BACK maybe
-     {"Next\nPage", {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_RIGHT_BRACE}}}, // CONSUMER_BROWSER_FORWARD maybe
-     {"Enter", {KEYBOARD_HID_TYPE, KEY_ENTER}},
-     {"^", {KEYBOARD_HID_TYPE, KEY_PAGE_UP}},
-     {"v", {KEYBOARD_HID_TYPE, KEY_PAGE_DOWN}}},
+    // {{"Navigation"}, {"Page"},
+    //  {"Prev\nPage", {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_LEFT_BRACE}}},  // CONSUMER_BROWSER_BACK maybe
+    //  {"Next\nPage", {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_RIGHT_BRACE}}}, // CONSUMER_BROWSER_FORWARD maybe
+    //  {"Enter", {KEYBOARD_HID_TYPE, KEY_ENTER}},
+    //  {"^", {KEYBOARD_HID_TYPE, KEY_PAGE_UP}},
+    //  {"v", {KEYBOARD_HID_TYPE, KEY_PAGE_DOWN}}},
 
-    {{"System"}, {"Brightness"},
-     {"Ext\n-", {KEYBOARD_HID_TYPE, KEY_SCROLL_LOCK}}, // External Display
-     {"Ext\n+", {KEYBOARD_HID_TYPE, KEY_PAUSE}},       // External Display
-     {},
-     {"-", {CONSUMER_HID_TYPE, CONSUMER_BRIGHTNESS_DOWN}}, // Internal Display
-     {"+", {CONSUMER_HID_TYPE, CONSUMER_BRIGHTNESS_UP}}},   // Internal Display
+    // {{"System"}, {"Brightness"},
+    //  {"Ext\n-", {KEYBOARD_HID_TYPE, KEY_SCROLL_LOCK}}, // External Display
+    //  {"Ext\n+", {KEYBOARD_HID_TYPE, KEY_PAUSE}},       // External Display
+    //  {},
+    //  {"-", {CONSUMER_HID_TYPE, CONSUMER_BRIGHTNESS_DOWN}}, // Internal Display
+    //  {"+", {CONSUMER_HID_TYPE, CONSUMER_BRIGHTNESS_UP}}},   // Internal Display
 };
 
 /* Index of mode to use upon startup, starting from 0 (zero) */
-#define DEFAULT_MODE 1
+#define DEFAULT_MODE 2
 
 /* How many lines to scroll for mouse wheel events */
 #define MOUSE_SCROLL_AMOUNT 5

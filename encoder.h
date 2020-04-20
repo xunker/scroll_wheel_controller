@@ -33,4 +33,6 @@ ISR(PCINT0_vect) {
   }
 }
 
+bool isAccelerated = false;
+
 #endif
