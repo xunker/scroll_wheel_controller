@@ -53,6 +53,9 @@ unsigned long nextOutput = OUTPUT_EVERY;
 boolean keyboardPressed = false; // is Keyboard in currently-pressed state?
 boolean consumerPressed = false; // is Consumer in currently-pressed state?
 
+uint8_t clickAccelCount = 0;
+unsigned long nextClickAccelCheck = CLICK_ACCEL_EVERY;
+
 controlMode currentMode() {
   return controlModeList[currentModeIndex];
 }
@@ -301,7 +304,7 @@ void toggleToggleMode() {
 void loop() {
   readButtons();
 
-  unsigned long currentMillis = millis();
+  unsigned long currentMillis = millis(); 
 
   if (nextOutput < currentMillis) {
     nextOutput = currentMillis + OUTPUT_EVERY;
@@ -363,23 +366,28 @@ void loop() {
     toggleToggleMode();
   }
 
-  // check if acceleration should happen
-  if ((!isAccelerated) && (encoderTurned != 0)) {
-    if (abs(encoderTurned) > 1) {
-      isAccelerated = true;
-      encoderTurned = 1;
-    }
+  if (encoderTurned != 0) {
+    clickAccelCount += abs(encoderTurned);
   }
 
-  if ((isAccelerated) && (encoderTurned == 0)) {
-    isAccelerated = false;
+  // check if acceleration should happen
+  if (nextClickAccelCheck <= currentMillis) {
+    nextClickAccelCheck = currentMillis + CLICK_ACCEL_EVERY;
+
+    if (clickAccelCount >= CLICK_ACCEL_TRIGGER) {
+      isAccelerated = true;
+    } else {
+      isAccelerated = false;
+    }
+
+    clickAccelCount = 0;
   }
 
   if (encoderTurned < 0) {
     debugf("CCW: ");
     debugln(encoderTurned);
     encoderTurned++;
-    if (isAccelerated) {
+    if ((isAccelerated) && (currentMode().wheelCCWAccel.keys[0].keyCode > 0)){
       sendActionAndRelease(currentMode().wheelCCWAccel);
     } else {
       sendActionAndRelease(currentMode().wheelCCW);
@@ -388,7 +396,7 @@ void loop() {
     debugf("CW: ");
     debugln(encoderTurned);
     encoderTurned--;
-    if (isAccelerated) {
+    if ((isAccelerated) && (currentMode().wheelCWAccel.keys[0].keyCode > 0)) {
       sendActionAndRelease(currentMode().wheelCWAccel);
     } else {
       sendActionAndRelease(currentMode().wheelCW);

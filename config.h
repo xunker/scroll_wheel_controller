@@ -4,7 +4,7 @@
 #include "mcu.h" // Config options for specific microcontrollers, such as which pins to use
 
 /* Enable Serial debugging */
-#define ENABLE_DEBUGGING
+// #define ENABLE_DEBUGGING
 
 /* If debugging is enabled, this is the baud rate */
 #define DEBUG_BAUD 57600
@@ -35,5 +35,13 @@
 
 /* Maximum length of any text label field */
 #define MAX_LABEL_LENGTH 12
+
+/* Wheel acceleration: trigger acceleration when CLICK_ACCEL_TRIGGER or more
+   wheel clicks happen in CLICK_ACCEL_EVERY milliseconds (if the current
+   control mode has a wheel acceleration mode configured). */
+#define CLICK_ACCEL_EVERY 250 // milliseconds
+// trigger accel when wheel clicked more than this in CLICK_ACCEL_EVERY time
+#define CLICK_ACCEL_TRIGGER 5 
+
 
 #endif
