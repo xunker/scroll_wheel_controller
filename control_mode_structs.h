@@ -14,7 +14,6 @@ struct actionKeypress {
 struct controlAction {
   const char name[MAX_LABEL_LENGTH]; // name of action
   actionKeypress keys[MAX_KEYS_PER_ACTION]; // standard keys to send
-  actionKeypress accelKeys[MAX_KEYS_PER_ACTION]; // accelerated keys to send
   uint8_t modeMask;
 };
 
@@ -44,6 +43,8 @@ struct controlMode {
   controlAction middle;
   controlAction wheelCW;
   controlAction wheelCCW;
+  controlAction wheelCWAccel;
+  controlAction wheelCCWAccel;
 };
 
 

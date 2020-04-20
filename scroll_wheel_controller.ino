@@ -190,51 +190,41 @@ void sendAction(controlAction actionToSend)
   debugf("Sending key action '");
   debug(actionToSend.name);
   debugfln("'");
-
-
   
   for (uint8_t i = 0; i < MAX_KEYS_PER_ACTION; i++) {
-    actionKeypress keysToSend;
-    if (isAccelerated) {
-      debugfln("A");
-      keysToSend = actionToSend.accelKeys[i];
-    } else {
-      keysToSend = actionToSend.keys[i];
-    }
-
-    if (keysToSend.keyCode != NULL) {
+    if (actionToSend.keys[i].keyCode != NULL) {
 
       debugf("HID_TYPE: ");
-      debugfmt(keysToSend.keyCode, HEX);
+      debugfmt(actionToSend.keys[i].keyCode, HEX);
 
-      if (keysToSend.hidType == CONSUMER_HID_TYPE) {
+      if (actionToSend.keys[i].hidType == CONSUMER_HID_TYPE) {
         debugfln(" CONSUMER_HID_TYPE");
 
-        Consumer.press(keysToSend.keyCode);
+        Consumer.press(actionToSend.keys[i].keyCode);
         consumerPressed = true;
-      } else if (keysToSend.hidType == MOUSE_HID_TYPE) {
+      } else if (actionToSend.keys[i].hidType == MOUSE_HID_TYPE) {
         debugfln(" MOUSE_HID_TYPE");
 
-        if (bitRead(keysToSend.keyCode, 6)) {
+        if (bitRead(actionToSend.keys[i].keyCode, 6)) {
           debugfln("scrolling down");
           Mouse.move(0, 0, MOUSE_SCROLL_AMOUNT);
-        } else if (bitRead(keysToSend.keyCode, 5)) {
+        } else if (bitRead(actionToSend.keys[i].keyCode, 5)) {
           debugfln("scrolling up");
           Mouse.move(0, 0, -MOUSE_SCROLL_AMOUNT);
-        } else if (bitRead(keysToSend.keyCode, 4)) {
+        } else if (bitRead(actionToSend.keys[i].keyCode, 4)) {
           debugfln("left click");
           Mouse.click(MOUSE_LEFT);
-        } else if (bitRead(keysToSend.keyCode, 3)) {
+        } else if (bitRead(actionToSend.keys[i].keyCode, 3)) {
           debugfln("right click");
           Mouse.click(MOUSE_RIGHT);
-        } else if (bitRead(keysToSend.keyCode, 2)) {
+        } else if (bitRead(actionToSend.keys[i].keyCode, 2)) {
           debugfln("middle click");
           Mouse.click(MOUSE_MIDDLE);
         }
       } else {
         debugfln(" KEYBOARD_HID_TYPE");
 
-        Keyboard.press((KeyboardKeycode)keysToSend.keyCode);
+        Keyboard.press((KeyboardKeycode)actionToSend.keys[i].keyCode);
         keyboardPressed = true;
       }
 
@@ -375,9 +365,9 @@ void loop() {
 
   // check if acceleration should happen
   if ((!isAccelerated) && (encoderTurned != 0)) {
-    if (abs(encoderTurned) >= 1) {
+    if (abs(encoderTurned) > 1) {
       isAccelerated = true;
-      encoderTurned = 0;
+      encoderTurned = 1;
     }
   }
 
@@ -389,12 +379,20 @@ void loop() {
     debugf("CCW: ");
     debugln(encoderTurned);
     encoderTurned++;
-    sendActionAndRelease(currentMode().wheelCCW);
+    if (isAccelerated) {
+      sendActionAndRelease(currentMode().wheelCCWAccel);
+    } else {
+      sendActionAndRelease(currentMode().wheelCCW);
+    }
   } else if (encoderTurned > 0) {
     debugf("CW: ");
     debugln(encoderTurned);
     encoderTurned--;
-    sendActionAndRelease(currentMode().wheelCW);
+    if (isAccelerated) {
+      sendActionAndRelease(currentMode().wheelCWAccel);
+    } else {
+      sendActionAndRelease(currentMode().wheelCW);
+    }
   }
 
   if (inToggleMode() && (lastAction < currentMillis - TOGGLE_MODE_EXPIRES_IN)) {
