@@ -40,9 +40,9 @@ struct controlMode {
   const char wheelName[MAX_LABEL_LENGTH]; // name of scroll wheel action
   controlAction left;
   controlAction right;
+  controlAction middle;
   controlAction wheelCW;
   controlAction wheelCCW;
-  controlAction middle;
 };
 
 

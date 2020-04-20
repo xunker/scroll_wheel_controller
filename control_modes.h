@@ -42,23 +42,23 @@ const controlMode controlModeList[] = {
     {{"Volume"}, {"Volume"},
      {},
      {},
+     {"Mute", {CONSUMER_HID_TYPE, MEDIA_VOLUME_MUTE}},
      {"-", {CONSUMER_HID_TYPE, MEDIA_VOLUME_DOWN}},
-     {"+", {CONSUMER_HID_TYPE, MEDIA_VOLUME_UP}},
-     {"Mute", {CONSUMER_HID_TYPE, MEDIA_VOLUME_MUTE}}},
+     {"+", {CONSUMER_HID_TYPE, MEDIA_VOLUME_UP}}},
 
     {{"Media"}, {"Volume"},
      {"Prev\n<<", {CONSUMER_HID_TYPE, HID_CONSUMER_SCAN_PREVIOUS_TRACK}},
      {"Next\n>>", {CONSUMER_HID_TYPE, HID_CONSUMER_SCAN_NEXT_TRACK}},
+     {"Play/\nPause", {CONSUMER_HID_TYPE, MEDIA_PLAY_PAUSE}},
      {"-", {CONSUMER_HID_TYPE, MEDIA_VOLUME_DOWN}},
-     {"+", {CONSUMER_HID_TYPE, MEDIA_VOLUME_UP}},
-     {"Play/\nPause", {CONSUMER_HID_TYPE, MEDIA_PLAY_PAUSE}}},
+     {"+", {CONSUMER_HID_TYPE, MEDIA_VOLUME_UP}}},
 
     // {{"Media"}, {"Seek"},
     //  {"Prev\nTrack", {CONSUMER_HID_TYPE, HID_CONSUMER_SCAN_PREVIOUS_TRACK}},
     //  {"Next\nTrack", {CONSUMER_HID_TYPE, HID_CONSUMER_SCAN_NEXT_TRACK}},
+    //  {"Play/\nPause", {CONSUMER_HID_TYPE, MEDIA_PLAY_PAUSE}},
     //  {"<", {CONSUMER_HID_TYPE, HID_CONSUMER_SCAN_PREVIOUS_TRACK}, LONG_KEY_DOWN_TIME},
-    //  {">", {CONSUMER_HID_TYPE, HID_CONSUMER_SCAN_NEXT_TRACK}, LONG_KEY_DOWN_TIME},
-    //  {"Play/\nPause", {CONSUMER_HID_TYPE, MEDIA_PLAY_PAUSE}}},
+    //  {">", {CONSUMER_HID_TYPE, HID_CONSUMER_SCAN_NEXT_TRACK}, LONG_KEY_DOWN_TIME}},
 
     {{"VLC"}, {"Scrub"},
       {"Prev\n<<",
@@ -66,6 +66,9 @@ const controlMode controlModeList[] = {
       },
       {"Next\n>>",
         {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_RIGHT_ARROW}}
+      },
+      {"Play/\nPause",
+        {KEYBOARD_HID_TYPE, KEY_SPACE}
       },
       {"<",
         {
@@ -80,39 +83,36 @@ const controlMode controlModeList[] = {
           {KEYBOARD_HID_TYPE, KEY_LEFT_GUI},
           {KEYBOARD_HID_TYPE, KEY_RIGHT_ARROW}
         }
-      },
-      {"Play/\nPause",
-        {KEYBOARD_HID_TYPE, KEY_SPACE}
       }
     },
 
     {{"YouTube"}, {"Scrub"},
      {"Seek\n<<", {KEYBOARD_HID_TYPE, KEY_J}},
      {"Seek\n>>", {KEYBOARD_HID_TYPE, KEY_L}},
+     {"Play/\nPause", {KEYBOARD_HID_TYPE, KEY_SPACE}},
      {"<", {KEYBOARD_HID_TYPE, KEY_LEFT_ARROW}},
-     {">", {KEYBOARD_HID_TYPE, KEY_RIGHT_ARROW}},
-     {"Play/\nPause", {KEYBOARD_HID_TYPE, KEY_SPACE}}},
+     {">", {KEYBOARD_HID_TYPE, KEY_RIGHT_ARROW}}},
 
     {{"Mouse"}, {"Scroll"},
      {"Left\nClick", {MOUSE_HID_TYPE, MOUSE_LEFT_CLICK}},
      {"Right\nClick", {MOUSE_HID_TYPE, MOUSE_RIGHT_CLICK}},
+     {"Mid\nClick", {MOUSE_HID_TYPE, MOUSE_MIDDLE_CLICK}},
      {"^", {MOUSE_HID_TYPE, MOUSE_SCROLL_NEGATIVE}},
-     {"v", {MOUSE_HID_TYPE, MOUSE_SCROLL_POSITIVE}},
-     {"Mid\nClick", {MOUSE_HID_TYPE, MOUSE_MIDDLE_CLICK}}},
+     {"v", {MOUSE_HID_TYPE, MOUSE_SCROLL_POSITIVE}}},
 
     {{"Navigation"}, {"Page"},
      {"Prev\nPage", {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_LEFT_BRACE}}},  // CONSUMER_BROWSER_BACK maybe
      {"Next\nPage", {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_RIGHT_BRACE}}}, // CONSUMER_BROWSER_FORWARD maybe
+     {"Enter", {KEYBOARD_HID_TYPE, KEY_ENTER}},
      {"^", {KEYBOARD_HID_TYPE, KEY_PAGE_UP}},
-     {"v", {KEYBOARD_HID_TYPE, KEY_PAGE_DOWN}},
-     {"Enter", {KEYBOARD_HID_TYPE, KEY_ENTER}}},
+     {"v", {KEYBOARD_HID_TYPE, KEY_PAGE_DOWN}}},
 
     {{"System"}, {"Brightness"},
      {"Ext\n-", {KEYBOARD_HID_TYPE, KEY_SCROLL_LOCK}}, // External Display
      {"Ext\n+", {KEYBOARD_HID_TYPE, KEY_PAUSE}},       // External Display
+     {},
      {"-", {CONSUMER_HID_TYPE, CONSUMER_BRIGHTNESS_DOWN}}, // Internal Display
-     {"+", {CONSUMER_HID_TYPE, CONSUMER_BRIGHTNESS_UP}},   // Internal Display
-     {}},
+     {"+", {CONSUMER_HID_TYPE, CONSUMER_BRIGHTNESS_UP}}},   // Internal Display
 };
 
 /* Index of mode to use upon startup, starting from 0 (zero) */
