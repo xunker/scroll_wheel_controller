@@ -7,8 +7,8 @@
 #define CONSUMER_HID_TYPE 1
 #define MOUSE_HID_TYPE 2
 struct actionKeypress {
-  uint8_t hidType; // KEYBOARD_HID_TYPE,  CONSUMER_HID_TYPE, MOUSE_HID_TYPE
-  uint16_t keyCode; // ConsumerKeycode is uint16t, KeyboardKeycode is uint8_t
+  const uint8_t hidType; // KEYBOARD_HID_TYPE,  CONSUMER_HID_TYPE, MOUSE_HID_TYPE
+  const uint16_t keyCode; // ConsumerKeycode is uint16t, KeyboardKeycode is uint8_t
 };
 
 struct controlAction {

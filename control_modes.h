@@ -9,9 +9,11 @@ Format for controlMode is:
 {{"Mode Name"}, {"Scroll Wheel Function Name"},
     {"Left Arrow Function Name", {{KEY_TYPE, KEY_CODE}, ..., {KEY_TYPE, KEY_CODE}}, modeMask},
     {"Right Arrow Function Name", {{KEY_TYPE, KEY_CODE}, ..., {KEY_TYPE, KEY_CODE}}, modeMask},
+    {"Centre Button Action Name", {{KEY_TYPE, KEY_CODE}, ..., {KEY_TYPE, KEY_CODE}}, modeMask},
     {"CCW Scroll Wheel Action Name", {{KEY_TYPE, KEY_CODE}, ..., {KEY_TYPE, KEY_CODE}}, modeMask},
     {"CW Scroll Wheel Action Name", {{KEY_TYPE, KEY_CODE}, ..., {KEY_TYPE, KEY_CODE}}, modeMask},
-    {"Centre Button Action Name", {{KEY_TYPE, KEY_CODE}, ..., {KEY_TYPE, KEY_CODE}}, modeMask}},
+    {"CCW Scroll Wheel Accelerated Action Name", {{KEY_TYPE, KEY_CODE}, ..., {KEY_TYPE, KEY_CODE}}, modeMask},
+    {"CW Scroll Wheel Accelerated Action Name", {{KEY_TYPE, KEY_CODE}, ..., {KEY_TYPE, KEY_CODE}}, modeMask}},
 
 Mode Name is required. This is what is displayed at the top of the screen.
 
@@ -126,7 +128,7 @@ const controlMode controlModeList[] = {
 };
 
 /* Index of mode to use upon startup, starting from 0 (zero) */
-#define DEFAULT_MODE 2
+#define DEFAULT_MODE 1
 
 /* How many lines to scroll for mouse wheel events */
 #define MOUSE_SCROLL_AMOUNT 5

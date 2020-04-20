@@ -92,11 +92,19 @@ void updateDisplay() {
   // wheel actions
   if (strlen(currentMode().wheelName) > 0) {
     const char label[MAX_LABEL_LENGTH*2];
-    strcpy(label, currentMode().wheelCW.name);
+    if (isAccelerated) {
+      strcpy(label, currentMode().wheelCWAccel.name);
+    } else {
+      strcpy(label, currentMode().wheelCW.name);
+    }
     strcat(label, " ");
     strcat(label, currentMode().wheelName);
     strcat(label, " ");
-    strcat(label, currentMode().wheelCCW.name);
+    if (isAccelerated) {
+      strcat(label, currentMode().wheelCCWAccel.name);
+    } else {
+      strcat(label, currentMode().wheelCCW.name);
+    }
 
     oledPrintCentered(label, currentLayout().wheelActionLabelRow);
   }
@@ -375,9 +383,15 @@ void loop() {
     nextClickAccelCheck = currentMillis + CLICK_ACCEL_EVERY;
 
     if (clickAccelCount >= CLICK_ACCEL_TRIGGER) {
-      isAccelerated = true;
+      if (!isAccelerated) {
+        isAccelerated = true;
+        // updateDisplay();
+      }
     } else {
-      isAccelerated = false;
+      if (isAccelerated) {
+        isAccelerated = false;
+        // updateDisplay();
+      }
     }
 
     clickAccelCount = 0;
