@@ -110,7 +110,7 @@ const controlMode controlModeList[] = {
      {"Right\nBtn", {MOUSE_HID_TYPE, MOUSE_RIGHT_CLICK}},
      {"Mid\nBtn", {MOUSE_HID_TYPE, MOUSE_MIDDLE_CLICK}},
      {"^", {MOUSE_HID_TYPE, MOUSE_SCROLL_NEGATIVE}},
-     {"v", {MOUSE_HID_TYPE, MOUSE_SCROLL_POSITIVE}}},
+     {"_", {MOUSE_HID_TYPE, MOUSE_SCROLL_POSITIVE}}},
 
     // {{"Navigation"}, {"Page"},
     //  {"Prev\nPage", {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_LEFT_BRACE}}},  // CONSUMER_BROWSER_BACK maybe

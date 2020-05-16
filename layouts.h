@@ -65,8 +65,9 @@ rows of 8 pixels high. This means a 128x64 OLED has 8 rows. All of the "row"
 defintions below assume you are referring to one of the 8-pixel-high rows.
 */
 
+#include "fonts/font8x8_custom.h"
 const displayLayout displayLayouts[] = {
-  {font8x8, "font8x8", 0, 2, 2, 5, 7},
+  {font8x8_custom, "font8x8", 0, 2, 2, 5, 7},
   {Arial14, "Arial14", 0, 2, 2, 6, 8}, // 8 is off screen, won't be shown
 };
 
