@@ -34,7 +34,7 @@
 #define MAX_KEYS_PER_ACTION 3
 
 /* Maximum length of any text label field */
-#define MAX_LABEL_LENGTH 12
+#define MAX_LABEL_LENGTH 11
 
 /* Wheel acceleration: trigger acceleration when CLICK_ACCEL_TRIGGER or more
    wheel clicks happen in CLICK_ACCEL_EVERY milliseconds (if the current

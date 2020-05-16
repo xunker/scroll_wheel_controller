@@ -51,14 +51,14 @@ const controlMode controlModeList[] = {
     {{"Media"}, {"Volume"},
      {"Prev\n<<", {CONSUMER_HID_TYPE, HID_CONSUMER_SCAN_PREVIOUS_TRACK}},
      {"Next\n>>", {CONSUMER_HID_TYPE, HID_CONSUMER_SCAN_NEXT_TRACK}},
-     {"Play/\nPause", {CONSUMER_HID_TYPE, MEDIA_PLAY_PAUSE}},
+     {"Play\nPause", {CONSUMER_HID_TYPE, MEDIA_PLAY_PAUSE}},
      {"-", {CONSUMER_HID_TYPE, MEDIA_VOLUME_DOWN}},
      {"+", {CONSUMER_HID_TYPE, MEDIA_VOLUME_UP}}},
 
     // {{"Media"}, {"Seek"},
     //  {"Prev\nTrack", {CONSUMER_HID_TYPE, HID_CONSUMER_SCAN_PREVIOUS_TRACK}},
     //  {"Next\nTrack", {CONSUMER_HID_TYPE, HID_CONSUMER_SCAN_NEXT_TRACK}},
-    //  {"Play/\nPause", {CONSUMER_HID_TYPE, MEDIA_PLAY_PAUSE}},
+    //  {"Play\nPause", {CONSUMER_HID_TYPE, MEDIA_PLAY_PAUSE}},
     //  {"<", {CONSUMER_HID_TYPE, HID_CONSUMER_SCAN_PREVIOUS_TRACK}, LONG_KEY_DOWN_TIME},
     //  {">", {CONSUMER_HID_TYPE, HID_CONSUMER_SCAN_NEXT_TRACK}, LONG_KEY_DOWN_TIME}},
 
@@ -69,7 +69,7 @@ const controlMode controlModeList[] = {
       {"Next\n>>",
         {{KEYBOARD_HID_TYPE, KEY_LEFT_GUI}, {KEYBOARD_HID_TYPE, KEY_RIGHT_ARROW}}
       },
-      {"Play/\nPause",
+      {"Play\nPause",
         {KEYBOARD_HID_TYPE, KEY_SPACE}
       },
       {"<",
@@ -101,14 +101,14 @@ const controlMode controlModeList[] = {
     {{"YouTube"}, {"Scrub"},
      {"Seek\n<<", {KEYBOARD_HID_TYPE, KEY_J}},
      {"Seek\n>>", {KEYBOARD_HID_TYPE, KEY_L}},
-     {"Play/\nPause", {KEYBOARD_HID_TYPE, KEY_SPACE}},
+     {"Play\nPause", {KEYBOARD_HID_TYPE, KEY_SPACE}},
      {"<", {KEYBOARD_HID_TYPE, KEY_LEFT_ARROW}},
      {">", {KEYBOARD_HID_TYPE, KEY_RIGHT_ARROW}}},
 
     {{"Mouse"}, {"Scroll"},
-     {"Left\nClick", {MOUSE_HID_TYPE, MOUSE_LEFT_CLICK}},
-     {"Right\nClick", {MOUSE_HID_TYPE, MOUSE_RIGHT_CLICK}},
-     {"Mid\nClick", {MOUSE_HID_TYPE, MOUSE_MIDDLE_CLICK}},
+     {"Left\nBtn", {MOUSE_HID_TYPE, MOUSE_LEFT_CLICK}},
+     {"Right\nBtn", {MOUSE_HID_TYPE, MOUSE_RIGHT_CLICK}},
+     {"Mid\nBtn", {MOUSE_HID_TYPE, MOUSE_MIDDLE_CLICK}},
      {"^", {MOUSE_HID_TYPE, MOUSE_SCROLL_NEGATIVE}},
      {"v", {MOUSE_HID_TYPE, MOUSE_SCROLL_POSITIVE}}},
 
@@ -119,7 +119,7 @@ const controlMode controlModeList[] = {
     //  {"^", {KEYBOARD_HID_TYPE, KEY_PAGE_UP}},
     //  {"v", {KEYBOARD_HID_TYPE, KEY_PAGE_DOWN}}},
 
-    {{"System"}, {"Brightness"},
+    {{"System"}, {"Bright"},
      {"Ext\n-", {KEYBOARD_HID_TYPE, KEY_SCROLL_LOCK}}, // External Display
      {"Ext\n+", {KEYBOARD_HID_TYPE, KEY_PAUSE}},       // External Display
      {},
